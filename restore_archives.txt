@@ -1,0 +1,17 @@
+run {
+allocate channel Ch1 TYPE 'SBT_TAPE' PARMS 'SBT_LIBRARY=/opt/veeam/VeeamPluginforOracleRMAN/libOracleRMANPlugin.so' FORMAT 'e6518029-8f46-4e68-9d7c-62f7b2dc0d86/RMAN_%I_%d_%T_%U.vab';
+allocate channel Ch2 TYPE 'SBT_TAPE' PARMS 'SBT_LIBRARY=/opt/veeam/VeeamPluginforOracleRMAN/libOracleRMANPlugin.so' FORMAT 'e6518029-8f46-4e68-9d7c-62f7b2dc0d86/RMAN_%I_%d_%T_%U.vab';
+allocate channel Ch3 TYPE 'SBT_TAPE' PARMS 'SBT_LIBRARY=/opt/veeam/VeeamPluginforOracleRMAN/libOracleRMANPlugin.so' FORMAT 'e6518029-8f46-4e68-9d7c-62f7b2dc0d86/RMAN_%I_%d_%T_%U.vab';
+allocate channel Ch4 TYPE 'SBT_TAPE' PARMS 'SBT_LIBRARY=/opt/veeam/VeeamPluginforOracleRMAN/libOracleRMANPlugin.so' FORMAT 'e6518029-8f46-4e68-9d7c-62f7b2dc0d86/RMAN_%I_%d_%T_%U.vab';
+allocate channel Ch5 TYPE 'SBT_TAPE' PARMS 'SBT_LIBRARY=/opt/veeam/VeeamPluginforOracleRMAN/libOracleRMANPlugin.so' FORMAT 'e6518029-8f46-4e68-9d7c-62f7b2dc0d86/RMAN_%I_%d_%T_%U.vab';
+RESTORE ARCHIVELOG  sequence 314649 thread 1 ;
+release channel Ch1;
+release channel Ch2;
+release channel Ch3;
+release channel Ch4;
+release channel Ch5;
+}
+
+
+
+DELETE FORCE ARCHIVELOG ALL BACKED UP 1 TIMES TO DEVICE TYPE SBT_TAPE;

@@ -1,0 +1,19 @@
+select days_into_past, part_action_ind from tstcbf_r250.part_control_master where table_name = 'PROCESS_STATUS';
+
+update tstcbf_r250.part_control_master set DAYS_INTO_PAST = 180, part_action_ind = 3 where table_name = 'PROCESS_STATUS';
+
+commit;
+
+exec tstcbf_r250.partition_control_pkg.del_partitions('PROCESS_STATUS');
+
+update tstcbf_r250.part_control_master set DAYS_INTO_PAST = 365, part_action_ind = 1 where table_name = 'PROCESS_STATUS';
+
+commit ;
+
+select 'alter index TSTCBF_R250.'||index_name||' rebuild online ;' from dba_indexes where table_name='PROCESS_STATUS' and status not in ('VALID','N/A','USABLE')
+select * from dba_ind_partitions where index_name in (select index_name from dba_indexes where table_name='PROCESS_STATUS')
+and status not in ('VALID','N/A','USABLE')
+
+
+select * from dba_ind_subpartitions where index_name in (select index_name from dba_indexes where table_name='PROCESS_STATUS')
+and status not in ('VALID','N/A','USABLE')

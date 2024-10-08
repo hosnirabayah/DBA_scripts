@@ -1,0 +1,16 @@
+select "Exection Time",composite_name,source_transaction_id,MSISDN,part_date from (
+SELECT  24*60*60
+            * (TO_DATE (SUBSTR (end_time_stamp, 0, 19), 'YYYY-MM-DD HH24:MI:SS')
+                - TO_DATE (SUBSTR (start_time_stamp, 0, 19),
+                  'YYYY-MM-DD HH24:MI:SS'))
+                AS "Exection Time", a.*
+  FROM  febcus_ofm.log_ofm_process_exceution a
+ WHERE       part_date > SYSDATE - 2 / 1440
+  and        part_date < SYSDATE - 0.5/1440
+ 
+/*ADVICE(7): Complex expression not fully parenthesized [404] */
+/*ADVICE(8): Complex expression not fully parenthesized [404] */
+            
+     AND composite_name = 'E-TopUpTransaction'
+            
+            ) order by "Exection Time" desc

@@ -1,0 +1,2 @@
+select * from shares.meeting
+delete from shares.attendance where meetingcode=10

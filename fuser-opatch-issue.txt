@@ -1,0 +1,27 @@
+      (1) Set the environment variable OPATCH_NO_FUSER=true
+
+           (2) Shut down the WebLogic instances
+
+           (3) Run the OPatch utility
+
+ 
+
+Set temporary fuser
+           (1) Set /tmp in your PATH
+
+           (2) Create an empty file named "fuser"
+
+           (3) Shut down the WebLogic instances
+
+           (4) Run the OPatch utility
+
+ 
+
+Install fuser utility
+           (1) Install fuser utility on the machine (contact your OS Admin)
+
+           (2) Make sure fuser is located under "/sbin/fuser" or "/bin/fuser"
+
+           (3) Shut down the WebLogic instances
+
+           (4) Run the OPatch utility

@@ -1,0 +1,4 @@
+select vs.sid, vs.username, vs.osuser, vs.process fg_pid, 
+vp.spid bg_pid 
+from v$session vs, v$process vp 
+where vs.paddr = vp.addr and vs.OSUSER='Abdallah.Sammour' 

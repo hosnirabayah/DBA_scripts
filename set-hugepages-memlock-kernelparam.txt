@@ -1,0 +1,14 @@
+Dear Basel,
+
+We will follow the below procuder:
+
+1-	Upgrade DB memory to 32GB instead of 18GB on the second node then the first node.
+2-	Start the DB
+3-	Calculate the new huge pages size (lets say the new huge page size is equal x)
+4-	Set the new huge pages kernel parameter usning .sh script
+5-	Set memlock kernel parameter as the following equation (output * page size):
+
+(HugePages * Hugepagesize) for example based on the current setting: memory lock should be: 36886* 2048= 75542528
+
+This value subject to change after upgrading the memory.
+The value must be set into the two nodes with same steps	

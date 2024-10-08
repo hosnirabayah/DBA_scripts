@@ -1,0 +1,38 @@
+
+If you need to start the OBIEE service with a specific user (in this case, the oracle user), you can configure the systemd unit file to run the service as that user. Here's how you can modify the unit file:
+
+Open the Unit File for Editing:
+bash
+Copy code
+sudo nano /etc/systemd/system/obiee_startup.service
+Modify the Unit File:
+Update the Service section of the unit file to specify the user under which the service should run. You can use the User directive for this purpose. Your modified unit file might look like this:
+plaintext
+Copy code
+[Unit]
+Description=OBIEE Startup Service
+After=network.target
+
+[Service]
+Type=simple
+User=oracle
+ExecStart=/path/to/obiee/bin/start.sh
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
+Replace /path/to/obiee/bin/start.sh with the actual path to your OBIEE startup script.
+Save the Unit File:
+Save the changes to the unit file and exit the text editor.
+Reload systemd:
+Copy code
+sudo systemctl daemon-reload
+Enable and Start the Service:
+bash
+Copy code
+sudo systemctl enable obiee_startup.service
+sudo systemctl start obiee_startup.service
+Test:
+Reboot the system to test whether OBIEE starts automatically with the oracle user.
+This setup ensures that the OBIEE service is started with the specified oracle user account. Make sure to replace placeholder paths and commands with the actual paths and commands relevant to your OBIEE installation.

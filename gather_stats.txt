@@ -1,0 +1,5 @@
+begin
+dbms_stats.gather_table_stats(ownname=>'NPHIESDWHPROD',
+tabname=>'CH_PERF',estimate_percent=>10,block_sample=>true,
+method_opt=>'FOR ALL INDEXED COLUMNS SIZE AUTO',cascade=>true,granularity=>'ALL',degree=>8);
+end;

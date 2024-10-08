@@ -1,0 +1,5 @@
+to confirm asm disk type:
+run the server on xmanager
+hit asmca
+add disk
+make sure disk type same as existing

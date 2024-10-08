@@ -1,0 +1,3 @@
+select 'grant '||privilege||' on '||owner||'.'||table_name||' to h0285 ;' from dba_tab_privs a
+where grantee ='OWBRT'
+and owner <> 'SYS

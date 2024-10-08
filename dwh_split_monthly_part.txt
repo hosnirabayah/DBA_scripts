@@ -1,0 +1,33 @@
+DECLARE
+sql_stmt    VARCHAR2(200);
+max_date    date;
+BEGIN
+FOR i IN (
+select  pm.table_name,pm.days_into_future from SEHATI_STG_TPO.part_master pm
+)
+LOOP
+update SEHATI_STG_TPO.part_master set MAX_HV = (SELECT max(to_date(SUBSTR(partition_name, -8),'YYYYMMDD')) FROM  dba_tab_partitions where 
+table_owner ='SEHATI_STG_TPO' and table_name = i.table_name and partition_name
+not in ('FIRST_PART', 'P_DATE_OTHER') and partition_name not like 'SYS%' and partition_name not like '%_DATA%' and partition_name like 'P_DATE_TO_%') where  table_name =i.table_name  ;
+---sql_stmt :='alter table TPO_LOGS."'||i.table_name||'" split partition P_DATE_OTHER at (to_date('||''''||to_char(sysdate+i.days_into_future,'yyyy-mm-dd')||''''||','||''''||'yyyy-mm-dd'||''''||')) into (partition P_DATE_TO_'||to_char(sysdate+i.days_into_future,'yyyymmdd')||', partition P_DATE_OTHER)';
+commit;
+END LOOP;
+END;
+
+
+DECLARE
+sql_stmt    VARCHAR2(500);
+begin
+FOR i IN (
+select  pm.table_name,pm.days_into_future,pm.MAX_HV from DWHUSER_TMB.part_master pm
+)
+LOOP
+sql_stmt :='alter table DWHUSER_TMB."'||i.table_name||'" split partition P_DATE_OTHER at (to_date('||''''||to_char(ADD_MONTHS(i.max_hv,1),'YYYYMMDD')||''''||','||''''||'yyyymmdd'||''''||')) into (partition P_DATE_TO_'||to_char(ADD_MONTHS(i.max_hv,1),'YYYYMMDD')||', partition P_DATE_OTHER)';
+dbms_output.put_line(sql_stmt);
+execute immediate sql_stmt ;
+END LOOP;
+END;
+
+select 'alter table SEHATI_STG_TPO."'||table_name||'" split partition P_DATE_OTHER at (to_date('||''''||to_char(next_date,'yyyymmdd')||''''||','||''''||'yyyymmdd'||''''||')) into (partition P_DATE_TO_'||to_char(next_date,'yyyymmdd')||', partition P_DATE_OTHER) ;' 
+
+from SEHATI_STG_TPO.part_master where max_hv <> to_date('20221101','yyyymmdd')

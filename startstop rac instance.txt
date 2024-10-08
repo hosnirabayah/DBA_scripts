@@ -1,0 +1,14 @@
+srvctl stop instance -d PRDOFM -i PRDOFM2 -o immediate
+srvctl stop instance -d PRDCRM -i PRDCRM2 -o immediate
+srvctl stop instance -d PRDBI  -i PRDBI2 -o immediate
+
+
+srvctl start instance -d PRDOFM -i PRDOFM2
+
+srvctl start instance -d PRDCRM -i PRDCRM2
+
+
+srvctl start instance -d PRDBI -i PRDBI2
+
+
+srvctl stop asm -f

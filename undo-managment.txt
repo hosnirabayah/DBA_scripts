@@ -1,0 +1,7 @@
+select *
+from  dba_rollback_segs where tablespace_name <>'UNDOTBS1';
+
+
+show parameter undo ;
+
+show parameter undo_retention;

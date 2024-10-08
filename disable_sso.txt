@@ -1,0 +1,8 @@
+Stop the BI system.
+Enter a SSO management command from the table using the WLST command line.
+Start WLST using ./wlst.sh command.
+Optional: Run the command help(‘BILifecycle’) to display help about enableBISingleSignOn and disableBISingleSignOn commands and their arguments.
+Run the enableBISingleSignOn or disableBISingleSignOn command using the arguments appropriate for each command.
+For example: enableBISingleSignOn('C:/.../user_projects/domains/bi','/bi-security-login/logout?redirect=/va') or disableBISingleSignOn('C:/oracle/Middleware/Oracle_Home/user_projects/domains/bi')
+
+The SSO configuration for Oracle Analytics Server is updated.

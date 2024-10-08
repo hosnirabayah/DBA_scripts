@@ -1,0 +1,51 @@
+srvctl stop listener -n wp-dwh1
+
+srvctl status listener -n wp-dwh1
+
+srvctl status database -d dwh
+
+srvctl stop database -d dwh
+
+srvctl status database -d dwh
+
+srvctl stop asm -n wp-dwh1 -f
+
+srvctl status asm -n wp-dwh1
+
+srvctl stop nodeapps -n wp-dwh1 -f
+
+srvctl status nodeapps -n wp-dwh1
+
+rsctl check cluster -all
+rsctl stop cluster -all
+crsctl stop crs
+
+crsctl check cluster -
+
+if any service dont stop:
+
+crsctl stat res -t -init
+
+this will return :
+
+ora.asm
+      1        ONLINE  ONLINE       wp-dwh1                  Started
+ora.crf
+      1        ONLINE  ONLINE       wp-dwh1
+ora.crsd
+      1        ONLINE  ONLINE       wp-dwh1
+ora.cssd
+      1        ONLINE  ONLINE       wp-dwh1
+ora.cssdmonitor
+      1        ONLINE  ONLINE       wp-dwh1
+ora.ctssd
+      1        ONLINE  ONLINE       wp-dwh1                  OBSERVER
+ora.diskmon
+      1        OFFLINE OFFLINE
+ora.drivers.acfs
+then stop the online service:
+crsctl stop res ora.ctssd -init 
+
+
+
+

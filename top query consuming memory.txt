@@ -1,0 +1,8 @@
+select  
+b.username,b.sid,b.serial#,a.spid,b.program,b.machine,b.logon_time,b.status,'alter system kill session '||''''||b.sid||','||b.serial#||''''||'immediate;',round(sum(a.pga_used_mem)/1024/1024,2) "Used_mem/MB"
+from v$process a,v$session b
+where a.addr=b.paddr
+and b.username is not null
+--and a.spid=8240
+group by b.username,b.sid,b.serial#,a.spid,b.program,b.machine,b.logon_time,b.status,'alter system kill session '||''''||b.sid||','||b.serial#||''''||'immediate;'
+order by 10 desc;

@@ -1,0 +1,20 @@
+select * from (
+select p.spid "ospid",
+(se.SID),ss.serial#,ss.SQL_ID,ss.username,substr(ss.program,1,22) "program",ss.module,ss.osuser,ss.MACHINE,ss.status,
+se.VALUE/100 cpu_usage_sec
+from
+v$session ss,
+v$sesstat se,
+v$statname sn,
+v$process p
+where
+se.STATISTIC# = sn.STATISTIC#
+and
+NAME like '%CPU used by this session%'
+and
+se.SID = ss.SID
+and ss.username !='SYS' and
+ss.status='ACTIVE'
+and ss.username is not null
+and ss.paddr=p.addr and value > 0
+order by se.VALUE desc);

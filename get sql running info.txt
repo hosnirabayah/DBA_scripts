@@ -1,0 +1,3 @@
+select select SQL_ID from v$session where sid=437
+
+select * from v$sql where sql_id in (select  SQL_ID from v$session where sid=437)

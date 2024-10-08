@@ -1,0 +1,10 @@
+select * from dba_tab_stats_history where table_name='LOG_OFM_PAYMENT_REGISTRATION'
+SELECT count(1) HOW_MANY
+FROM octd1_ofm.LOG_OFM_PAYMENT_REGISTRATION partition (LOG_OFM_PAY_REG_2021_05);
+
+3000
+
+SELECT num_rows
+FROM dba_tab_statistics
+WHERE --owner = 'SIEBEL'
+ table_name = 'LOG_OFM_PAYMENT_REGISTRATION' and partition_name='LOG_OFM_PAY_REG_2021_05' ;

@@ -1,0 +1,53 @@
+CREATE OR REPLACE TRIGGER SYSMAN.SEND_SMS_HPOM
+ AFTER 
+ INSERT
+ ON "SYSMAN"."INCIDENT_LOG_E"
+ REFERENCING OLD AS OLD NEW AS NEW
+begin
+INSERT INTO em_pending_sms
+            (body, flag,alarm_time)
+   SELECT REPLACE( 'Target: '
+       ||a.TARGET_NAME||chr(10)||
+        'Alert_MSG: '
+       ||a.MESSAGE ||chr(10)||
+        ' Occured Time: '
+       ||to_char(to_date(SUBSTR(a.timezone,3,15),'MON DD HH24:MI:SS')+interval '120' minute,'DD MON HH24:MI:SS') ||chr(10), '"', ' ' ),
+       0,sysdate
+  FROM sysman.incident_log a where  a.MESSAGE not like '%OWS-04086%' and a.MESSAGE not like '%BEA-000337%' and a.MESSAGE not like '%DFW-99998%' and  (a.MESSAGE not like '%The J2EE Application is down%' and a.TARGET_NAME not like '%dminServer/FMW Welcome Page Application%' ) ;--and a.TARGET_NAME not like '%OFM%' ;
+  delete from (select * from sysman.incident_log);
+  end;
+/
+--------------------------------------------------------------
+
+
+CREATE TABLE SYSMAN.EM_PENDING_SMS_E
+(
+  BODY        VARCHAR2(500 BYTE),
+  FLAG        NUMBER(1),
+  ALARM_TIME  DATE
+)
+TABLESPACE MGMT_TABLESPACE
+RESULT_CACHE (MODE DEFAULT)
+PCTUSED    0
+PCTFREE    10
+INITRANS   1
+MAXTRANS   255
+STORAGE    (
+            INITIAL          64K
+            NEXT             1M
+            MAXSIZE          UNLIMITED
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+            FLASH_CACHE      DEFAULT
+            CELL_FLASH_CACHE DEFAULT
+           )
+LOGGING 
+NOCOMPRESS 
+NOCACHE
+NOPARALLEL
+MONITORING;
+
+
+GRANT SELECT ON SYSMAN.EM_PENDING_SMS_E TO SYSMAN_RO;

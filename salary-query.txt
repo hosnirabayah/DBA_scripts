@@ -1,0 +1,9 @@
+         SELECT sum(result_value)
+                    FROM ERPINTRANET.xx_all_emp_elements_payroll_v
+                    where element_class =  'Deduction'--   'Earning'
+                    and assignment_id=7965
+                 --   and element_name='Basic Salary ILS'
+                    and assignment_action_id =540757963
+                    
+                  select assignment_id,assignment_action_id from ERPINTRANET.XX_ALL_EMP_PAYROLL_MV where employee_number like '%1316'
+                     and  payroll_date like '%2021%'

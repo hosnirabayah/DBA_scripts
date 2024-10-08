@@ -1,0 +1,34 @@
+Message=Count_of_distributed_transaction is 2 , Please check. 
+Severity=Critical 
+
+solved by :
+
+select count(*) from DBA_2PC_PENDING ;
+
+COUNT(*)
+----------
+22
+
+
+select max(fail_time) from dba_2pc_pending;
+
+MAX(FAIL_
+---------
+03-MAR-12
+
+
+select 'rollback force '''||local_tran_id||''' ;' from dba_2pc_pending ;
+
+'ROLLBACKFORCE'''||LOCAL_TRAN_ID||''';'
+--------------------------------------------------------------------------------------
+rollback force '15.41.373682' ;
+rollback force '18.10.103548' ;
+rollback force '20.35.447783' ;
+...
+
+
+select 'exec dbms_transaction.purge_lost_db_entry('''||local_tran_id||''' )' , 'commit;' from
+dba_2pc_pending;
+
+
+'EXECDBMS_TRANSACTION.PURGE_LOST_DB_ENTRY('''||LOCAL_TRAN_ID||''')'

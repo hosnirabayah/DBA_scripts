@@ -1,0 +1,139 @@
+select 'ALTER TABLE TPO_LOGS.'||'"'||table_name||'" SET INTERVAL ();'
+from dba_tables where owner = 'TPO_LOGS'
+and table_name in 
+(select distinct(table_name) from dba_tab_partitions where owner = 'TPO_LOGS')
+
+
+sELECT    'alter table fraud_db.'
+       || '"'
+       || table_name
+       || '"'
+       || ' modify PARTITION BY RANGE (CREATED_DATE)'||'  ( PARTITION P_DATE_TO_20230501 
+VALUES LESS THAN (TIMESTAMP '
+/*ADVICE(10): Literal string contains a new-line or other unprintable
+                  character [106] */
+       || ''''
+       || '2023-05-01 00:00:00'
+       || ''''
+       || ')) parallel 16 ;'
+from   dba_tables a where a.owner = 'FRAUD_DB'
+ and table_name  in ('TRANSACTION_QUEUE',
+'QUEUE_LOG',
+'PATIENT',
+'FRAUD_RULES_HIST',
+'FRAUD_RULES',
+'FRAUD_RULE_FLOW',
+'CLAIM_HISTORY',
+'ACT_DETAILS')
+
+
+select 'ALTER TABLE TPO_LOGS.'||'"'||table_name||'" add parTITION P_DATE_OTHER VALUES LESS THAN (MAXVALUE);'
+from dba_tables where owner = 'TPO_LOGS'
+and table_name in 
+(select distinct(table_name) from dba_tab_partitions where owner = 'TPO_LOGS')
+
+
+select 'ALTER TABLE SEHATI_PROD_TPO."'||table_name||
+'" MOVE partition '||partition_name||' ROW STORE COMPRESS ADVANCED ;'
+
+from dba_tab_partitions where table_owner = 'SEHATI_PROD_TPO'
+
+and partition_name = 'P_DATE_OTHER'
+
+
+select 'ALTER TABLE TPO_LOGS."'||table_name||'" MOVE PARTITION P_DATE_OTHER ONLINE LOB("'||column_name||'") STORE AS SECUREFILE (COMPRESS HIGH);' from dba_lobs where owner ='TPO_LOGS' and table_name in (
+select table_name-- 'ALTER TABLE TPO_LOGS.'||'"'||table_name||'" add parTITION P_DATE_OTHER VALUES LESS THAN (MAXVALUE);'
+from dba_tables where owner = 'TPO_LOGS'
+and table_name in 
+(select distinct(table_name) from dba_tab_partitions where owner = 'TPO_LOGS'))
+
+
+CREATE TABLE DWHUSER_TMB.PART_MASTER
+(
+  TABLE_NAME        VARCHAR2(50 BYTE),
+  DAYS_INTO_FUTURE  NUMBER,
+  MAX_HV            DATE
+)
+TABLESPACE DWH_TS
+RESULT_CACHE (MODE DEFAULT)
+PCTUSED    0
+PCTFREE    10
+INITRANS   1
+MAXTRANS   255
+STORAGE    (
+            INITIAL          64K
+            NEXT             1M
+            MAXSIZE          UNLIMITED
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+            FLASH_CACHE      DEFAULT
+            CELL_FLASH_CACHE DEFAULT
+           )
+LOGGING 
+NOCOMPRESS 
+NOCACHE
+NOPARALLEL
+MONITORING;
+
+DECLARE
+sql_stmt    VARCHAR2(500);
+begin
+FOR i IN (
+select  table_name from dba_tables where  table_name in (select distinct(table_name) from dba_tab_partitions where 
+table_owner = 'SEHATI_PROD_TPO') and owner = 'SEHATI_PROD_TPO' )
+LOOP
+insert into SEHATI_PROD_TPO.part_master values (i.table_name,7,'');
+commit;
+--sql_stmt :='alter table DWHUSER_TMB."'||i.table_name||'" split partition P_DATE_OTHER at (to_date('||''''||to_char(ADD_MONTHS(i.max_hv,1),'YYYYMMDD')||''''||','||''''||'yyyymmdd'||''''||')) into (partition P_DATE_TO_'||to_char(ADD_MONTHS(i.max_hv,1),'YYYYMMDD')||', partition P_DATE_OTHER)';
+--dbms_output.put_line(sql_stmt);
+--execute immediate sql_stmt ;
+END LOOP;
+END;
+
+
+DECLARE
+sql_stmt    VARCHAR2(200);
+max_date    date;
+BEGIN
+FOR i IN (
+select  pm.table_name,pm.days_into_future from DWHUSER_TMB.part_master pm 
+)
+LOOP
+update DWHUSER_TMB.part_master set MAX_HV = (SELECT max(to_date(SUBSTR(partition_name, -8),'YYYYMMDD')) FROM  dba_tab_partitions where 
+table_owner ='DWHUSER_TMB' and table_name = i.table_name and partition_name
+not in ('FIRST_PART', 'P_DATE_OTHER') and partition_name not like 'SYS%') where  table_name =i.table_name  ;
+--sql_stmt :='alter table TPO_LOGS."'||i.table_name||'" split partition P_DATE_OTHER at (to_date('||''''||to_char(sysdate+i.days_into_future,'yyyy-mm-dd')||''''||','||''''||'yyyy-mm-dd'||''''||')) into (partition P_DATE_TO_'||to_char(sysdate+i.days_into_future,'yyyymmdd')||', partition P_DATE_OTHER)';
+commit;
+END LOOP;
+END;
+
+
+DECLARE
+sql_stmt    VARCHAR2(500);
+begin
+FOR i IN (
+select  pm.table_name,pm.days_into_future,pm.MAX_HV from DWHUSER_TMB.part_master pm
+)
+LOOP
+sql_stmt :='alter table DWHUSER_TMB."'||i.table_name||'" split partition P_DATE_OTHER at (to_date('||''''||to_char(ADD_MONTHS(i.max_hv,1),'YYYYMMDD')||''''||','||''''||'yyyymmdd'||''''||')) into (partition P_DATE_TO_'||to_char(ADD_MONTHS(i.max_hv,1),'YYYYMMDD')||', partition P_DATE_OTHER)';
+dbms_output.put_line(sql_stmt);
+execute immediate sql_stmt ;
+END LOOP;
+END;
+
+
+select 'alter table TPO_LOGS."'||table_name||'" split partition P_DATE_OTHER at (to_date('||''''||'2022-10-29'||''''||','||''''||'yyyy-mm-dd'||''''||')) into (partition P_DATE_TO_20221029, partition P_DATE_OTHER);'
+
+from dba_tables where owner = 'TPO_LOGS'
+and table_name in 
+(select distinct(table_name) from dba_tab_partitions where owner = 'TPO_LOGS')
+
+
+
+select 'alter table TPO_LOGS."'||table_name||'" split partition P_DATE_OTHER at (to_date('||''''||to_char(sysdate+16,'yyyy-mm-dd')||''''||','||''''||'yyyy-mm-dd'||''''||')) into (partition P_DATE_TO_'||to_char(sysdate+16,'yyyymmdd')||', partition P_DATE_OTHER);'
+
+from dba_tables where owner = 'TPO_LOGS'
+and table_name in 
+(select distinct(table_name) from dba_tab_partitions where owner = 'TPO_LOGS')

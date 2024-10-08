@@ -1,0 +1,19 @@
+DECLARE
+sql_stmt    VARCHAR2(500);
+begin
+FOR i IN (SELECT table_name, partition_name
+  FROM (SELECT table_name,
+               partition_name,
+               TO_DATE (SUBSTR (partition_name, -8), 'YYYYMMDD') dd
+          FROM dba_tab_partitions
+         WHERE     table_owner = 'SEHATI_INTEGRATION'
+               AND table_name IN ('LogResponse', 'LogRequest')
+               AND partition_name LIKE 'P_DATE_TO_%')
+ WHERE dd <= SYSDATE - 7 AND dd >= SYSDATE - 21
+)
+LOOP
+sql_stmt :='alter table SEHATI_INTEGRATION."'||i.table_name||'" truncate partition '||i.partition_name||' cascade  ';
+dbms_output.put_line(sql_stmt);
+execute immediate sql_stmt ;
+END LOOP;
+END;

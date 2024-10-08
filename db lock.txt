@@ -1,0 +1,5 @@
+	select * from dba_objects a, gv$locked_object b
+	where a.object_id=b.object_id 
+
+
+

@@ -1,0 +1,2 @@
+select 'alter system kill session ''' ||SID||','||SERIAL# || ''' immediate;' from V$session where username='BAS' and status='INACTIVE' and machine like 'prbas0%'
+and sql_id is null;

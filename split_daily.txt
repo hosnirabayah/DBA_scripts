@@ -1,0 +1,31 @@
+
+DECLARE
+sql_stmt    VARCHAR2(200);
+max_date    date;
+BEGIN
+FOR i IN (
+select  pm.table_name,pm.days_into_future from fraud_db.part_master pm 
+)
+LOOP
+update fraud_db.part_master set MAX_HV = (SELECT max(to_date(SUBSTR(partition_name, -8),'YYYYMMDD')) FROM  dba_tab_partitions where 
+table_owner ='FRAUD_DB' and table_name = i.table_name and partition_name
+not in ('FIRST_PART', 'P_DATE_OTHER') and partition_name not like 'SYS%') where  table_name =i.table_name  ;
+--sql_stmt :='alter table TPO_LOGS."'||i.table_name||'" split partition P_DATE_OTHER at (to_date('||''''||to_char(sysdate+i.days_into_future,'yyyy-mm-dd')||''''||','||''''||'yyyy-mm-dd'||''''||')) into (partition P_DATE_TO_'||to_char(sysdate+i.days_into_future,'yyyymmdd')||', partition P_DATE_OTHER)';
+commit;
+END LOOP;
+END;
+
+DECLARE
+sql_stmt    VARCHAR2(500);
+pdate       VARCHAR2(100);
+begin
+FOR i IN (
+select  pm.table_name,pm.days_into_future,pm.MAX_HV from fraud_db.part_master pm
+)
+LOOP
+select  to_char(to_date(to_CHar(max_hv,'yyyymmdd'),'yyyymmdd') + INTERVAL '1' DAY,'yyyymmdd') into pdate  from fraud_db.part_master ;sql_stmt :='alter table fraud_db."'||i.table_name||'" split partition P_DATE_OTHER at (to_date('||''''||pdate||''''||','||''''||'yyyymmdd'||''''||')) into (partition P_DATE_TO_'||pdate||', partition P_DATE_OTHER)';
+dbms_output.put_line(sql_stmt);
+dbms_output.put_line(pdate);
+execute immediate sql_stmt ;
+END LOOP;
+END;

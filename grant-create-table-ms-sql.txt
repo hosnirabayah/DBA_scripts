@@ -1,0 +1,5 @@
+
+use wtp_vmsds
+GRANT CREATE TABLE TO [WTP\Hazim.Sharif];
+GRANT ALTER ON SCHEMA::dbo TO [WTP\Hazim.Sharif];
+GO

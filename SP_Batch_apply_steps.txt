@@ -1,0 +1,6 @@
+download the patch
+unzip to patch_top
+stop all ODI services, java processes 
+cd patch_top/ODI_SPB_12.2.1.4.240409/tools/spbat/generic/SPBAT
+./spbat.sh -phase precheck -oracle_home /home/oracle/Oracle/Middleware/Oracle_Home
+./spbat.sh -phase apply -oracle_home /home/oracle/Oracle/Middleware/Oracle_Home

@@ -1,0 +1,24 @@
+select
+SEGMENT_TYPE ,OWNER || '.' || SEGMENT_NAME as "Object"
+,BYTES/1024/1024/1024 ,TABLESPACE_NAME ,EXTENTS ,INITIAL_EXTENT
+,NEXT_EXTENT ,MIN_EXTENTS ,MAX_EXTENTS ,PCT_INCREASE
+from DBA_SEGMENTS
+where OWNER='WPT_INT'
+and SEGMENT_NAME in (select TABLE_NAME from DBA_TABLES where OWNER='WPT_INT'  union
+select INDEX_NAME from DBA_INDEXES where OWNER='WPT_INT' and TABLE_NAME='WPT_INT' union
+select SEGMENT_NAME from DBA_LOBS where OWNER='WPT_INT' and TABLE_NAME='WPT_INT') 
+order by BYTES/1024/1024/1024 desc
+
+********************************************************************************************
+SELECT owner, segment_name, segment_type, partition_name, ROUND(bytes/(1024*1024),2) SIZE_MB, tablespace_name 
+FROM DBA_SEGMENTS 
+WHERE SEGMENT_TYPE IN ('TABLE', 'TABLE PARTITION', 'TABLE SUBPARTITION', 
+'INDEX', 'INDEX PARTITION', 'INDEX SUBPARTITION', 'TEMPORARY', 'LOBINDEX', 'LOBSEGMENT', 'LOB PARTITION')
+AND TABLESPACE_NAME LIKE 'USERS' 
+--AND SEGMENT_NAME LIKE 'P2010201%' 
+--AND partition_name LIKE 'P20100201%'
+--AND segment_type = 'TABLE'
+--AND OWNER = 'TARGET_POC' 
+--AND ROUND(bytes/(1024*1024),2) > 1000 
+ORDER BY bytes DESC;
+

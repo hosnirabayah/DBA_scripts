@@ -1,0 +1,24 @@
+
+
+SELECT a.owner,
+       a.table_name,
+       NVL (a.num_rows, -1) num_rows,
+       b.tt tbl_size
+  FROM     dba_tables a
+       LEFT JOIN
+           (  SELECT segment_name tbl, SUM (bytes) / (1024 * 1024 * 1024) tt
+                FROM dba_segments
+                     where segment_name IN (SELECT table_name
+                                            FROM dba_tables where owner  in ('INTERMEDIATE_REGISTRY_DATABASE'
+,'DWHUSER_TMB'
+,'NPHIESDWHPROD'
+,'BILLING_DB'
+ )  )
+            GROUP BY segment_name) b
+       ON a.table_name = b.tbl
+WHERE a.owner in 
+('INTERMEDIATE_REGISTRY_DATABASE'
+,'DWHUSER_TMB'
+,'NPHIESDWHPROD'
+,'BILLING_DB'
+ ) order by tbl_size asc

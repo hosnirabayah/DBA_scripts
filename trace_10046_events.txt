@@ -1,0 +1,26 @@
+EXEC DBMS_SYSTEM.set_ev(si=>1386, se=>34527, ev=>10046, le=>12, nm=>'');
+
+
+ EXEC DBMS_SYSTEM.set_sql_trace_in_session(sid=>1386, serial#=>34527, sql_trace=>FALSE);
+-----------------------------------------------------------------------------------------------
+
+
+ALTER SESSION SET EVENTS '1652 trace name errorstack';
+
+You can set the diagnostic event instance-wide with the following statement:
+
+ALTER SYSTEM SET EVENTS '1652 trace name errorstack';
+
+The above statement will affect the current instance only and will not edit the server parameter file. That is to say, if you stop and restart the instance, the diagnostic event setting will no longer be active. I don’t recommend setting this diagnostic event on a permanent basis, but if you want to edit your server parameter file, you could use a statement like the following:
+
+ALTER SYSTEM SET EVENT = '1652 trace name errorstack' SCOPE = SPFILE;
+
+You can also set diagnostic events in another session (without affecting all sessions instance-wide) by using the “oradebug event” command in SQL*Plus.
+
+You can deactivate the ORA-1652 diagnostic event or remove all diagnostic event settings from the server parameter file with statements such as the following:
+
+ALTER SESSION SET EVENTS '1652 trace name context off';
+
+ALTER SYSTEM SET EVENTS '1652 trace name context off';
+
+ALTER SYSTEM RESET EVENT SCOPE = SPFILE SID = '*';

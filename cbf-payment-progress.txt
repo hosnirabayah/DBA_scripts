@@ -1,0 +1,5 @@
+  SELECT   TRUNC (update_date, 'HH'), COUNT (ROWNUM) Count_DONE
+     FROM   cbf.cbf_notification
+    WHERE   partition_key >= '27-aug-2019' AND status_ind = 3
+GROUP BY   TRUNC (update_date, 'HH')
+ORDER BY   TRUNC (update_date, 'HH') ASC;

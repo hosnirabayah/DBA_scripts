@@ -1,0 +1,5 @@
+select domain_name , managed_server_name , count(0) from prd_ofm.log_ofm_process_exceution
+where  PART_DATE  >  to_date('2017-06-12 12:44:00','YYYY-MM-DD HH24:MI:SS')
+and  PART_DATE  <  to_date('2017-06-12 12:45:00','YYYY-MM-DD HH24:MI:SS')
+group by domain_name , managed_server_name
+

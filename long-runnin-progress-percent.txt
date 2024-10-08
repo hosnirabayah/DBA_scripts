@@ -1,0 +1,7 @@
+select sl.sid, sl.opname,to_char(100*(sofar/totalwork), '990.9')||'%' pct_done,start_time,sysdate, sysdate+(time_remaining/60/60/24) done_by
+from v$session_longops sl, v$session s
+where sl.sid = s.sid
+    and sl.serial# = s.serial#
+    and sl.sid = 1380
+    and sofar != totalwork
+    and totalwork > 0;

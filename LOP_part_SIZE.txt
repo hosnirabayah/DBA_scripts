@@ -1,0 +1,33 @@
+SELECT  ts.table_owner "owner",
+        ts.table_name "table name",
+        s.SEGMENT_NAME "segment name",
+        s.SEGMENT_TYPE "segment type",
+        s.SEGMENT_SUBTYPE "lob type",
+        s.PARTITION_NAME "lob part name",
+        lp.column_name "lob name",
+        lp.compression "lob compression",
+        lp.partition_name "table part name",
+        ts.num_rows "num rows",
+        lp.tablespace_name "tablespace",
+        ROUND(sum(s.bytes)/1024/1024/1024) "size GB"
+FROM dba_segments s JOIN dba_lob_partitions lp
+ON (s.partition_name = lp.lob_partition_name)  
+   JOIN DBA_TAB_PARTITIONS ts
+        ON (TS.PARTITION_NAME = lp.PARTITION_NAME)
+WHERE lp.table_name='ClaimRequestContent'
+AND   ts.table_name='ClaimRequestContent'
+-- To limit the output to a specific tablespace, uncomment line below
+AND   s.tablespace_name='TPO_TS'
+-- To limit output to specific table subpartitions only, uncomment the following row
+--AND   lp.subpartition_name like 'SYS_SUBP186786%'
+AND s.segment_name IN ( SELECT lpt.lob_name
+                        FROM dba_lob_partitions lpt
+                        WHERE lpt.table_name IN ( 'ClaimRequestContent' ) )
+GROUP BY ts.table_owner,ts.table_name,s.SEGMENT_NAME,s.SEGMENT_TYPE,s.SEGMENT_SUBTYPE,s.PARTITION_NAME,lp.COMPRESSION,/*lp.subpartition_name*/lp.partition_name, lp.column_name,ts.num_rows,lp.tablespace_name
+/*
+To limit output to lob subpartitions with a specific size,
+uncomment the restriction above and change the operator to suit your needs ( <, >, =)
+or use BETWEEN x AND y
+*/
+-- HAVING ROUND(sum(s.bytes)/1024/1024/1024) between 1 and 10
+ORDER BY 12 DESC;

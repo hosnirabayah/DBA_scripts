@@ -1,0 +1,4 @@
+ALTER SYSTEM SET ENCRYPTION WALLET OPEN IDENTIFIED BY welcome1;
+
+
+administer key management set keystore open force keystore identified by welcome1 container=all;

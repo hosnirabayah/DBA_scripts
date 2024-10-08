@@ -1,0 +1,13 @@
+mysqlbackup --user=root --password=PTooR_2021 --host=localhost --backup-dir=/mysql_backup backup-and-apply-log --with-timestamp
+
+by root os user:
+1- stop mysql db >> systemctl stop mysqld
+2- rename old mysql BIN and Data
+3- restor my.cnf file from server-my.cnf
+4- rstore the DB from the data you want:mysqlbackup --defaults-file=/etc/my.cnf --backup-dir=/db/backup/2022-05-15_10-54-18 copy-back
+5- start mysql DB.
+
+
+
+
+

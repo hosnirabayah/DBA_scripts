@@ -1,0 +1,14 @@
+
+select * from dba_lob_partitions where table_name = 'ClaimRequestContent'
+and partition_name = 'SYS_P16916'
+
+then 
+
+select bytes/(1024*1024*1024) from dba_segments where segment_type = 'LOB PARTITION' and owner = 'SEHATI_PROD_TPO'
+
+and segment_name = 'SYS_LOB0000074622C00006$$' and partition_name='SYS_LOB_P16917'
+
+
+
+
+

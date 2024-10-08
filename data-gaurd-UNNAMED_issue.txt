@@ -1,0 +1,53 @@
+1. Check the standby_file_management parameter in the standby database.
+
+SQL> show parameter standby
+NAME TYPE VALUE
+------------------------------------ ----------- ------------------------------
+standby_archive_dest string ?/dbs/arch
+standby_file_management string MANUAL
+2. Cancel the recovery:
+
+SQL> recover managed standby database disconnect from session;
+Media recovery complete.
+
+3. Check the file, which caused the issue:[ STANDBY]
+
+SQL> select file#, error, name from v$datafile_header where ERROR='FILE MISSING';
+
+FILE# ERROR
+---------- -----------------------------------------------------------------
+NAME
+--------------------------------------------------------------------------------
+5 FILE MISSING
+
+SQL> select name from v$datafile where file#=5;
+
+NAME
+--------------------------------------------------------------------------------
+/oracle/app/oracle/product/12.1.0.2/dbhome_1/dbs/UNNAMED00005
+
+3. Recreate the datafile as below [ STANDBY ]
+
+SQL> alter database create datafile '/oracle/app/oracle/product/12.1.0.2/dbhome_1/dbs/UNNAMED00005' as new;
+
+database altered.
+If you dont have OMF files, then get the exact datafile name from primary and recreate.
+
+-- Primary
+SQL> select name from v$datafile where file#=5;
+NAME
+--------------------------------------------------------------------------------
+/archive/NONPLUG/NONCDB/NONCDB/datafile/o1_mf_prim_d9v1fq7k_.dbf
+
+
+-- Recreate datafile in standby
+
+SQL> alter database create datafile '/oracle/app/oracle/product/12.1.0.2/dbhome_1/dbs/UNNAMED00005'
+as '/archive/NONPLUG/NONCDB/NONCDB/datafile/o1_mf_prim_d9v1fq7k_.dbf';
+
+4. Set standby_file_management to AUTO, to avoid similar issue in future
+
+alter system set standby_file_management=AUTO scope=both;
+5. Start recovery in standby database
+
+alter database recover managed standby database disconnect from session;

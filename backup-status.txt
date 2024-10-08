@@ -1,0 +1,16 @@
+select
+    operation,
+    status,
+    object_type,
+    to_char(start_time,'mm/dd/yyyy:hh:mi:ss') as start_time,
+    to_char(end_time,'mm/dd/yyyy:hh:mi:ss') as end_time
+from
+    v$rman_status
+    where object_type like  '%INC%'
+--where
+   -- start_time > SYSDATE -1
+--and
+  --  operation = 'BACKUP'
+--'
+order by
+    start_time desc;

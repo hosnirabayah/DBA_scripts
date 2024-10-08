@@ -1,0 +1,26 @@
+TO RESOLVE UNAMED TABLESPACE ON THE STANDBY DATABASE
+ALTER DATABASE RECOVER MANAGED STANDBY DATABASE CANCEL;
+alter database recover managed standby database disconnect from session;
+
+1-	select file#,name from v$datafile;    --from primary
+
+2-	select file#,name from v$datafile where name like '%UNNAMED%';       --from standby
+ 
+alter database create datafile '/usr/oracle/bccdb/dbs/UNNAMED00010' as '/dev/vx/rdsk/bcc/bccdb_wpt_02.dbf';
+alter database create datafile '/rtb/app/oracle/10.2.0/dbs/UNNAMED00123’ as '/rtb/xdr/u13/ORACLE/xdr/tspace/chartab11012.dbf’;
+
+alter database create datafile '/rtb/app/oracle/10.2.0/dbs/UNNAMED00124’ as '/rtb/xdr/u12/ORACLE/xdr/tspace/charind11012.dbf’;
+alter database create datafile '/rtb/app/oracle/10.2.0/dbs/UNNAMED00125’ as '/rtb/xdr/u12/ORACLE/xdr/tspace/charind211012.dbf’;
+alter database create datafile '/rtb/app/oracle/10.2.0/dbs/UNNAMED00126’ as '/rtb/xdr/u12/ORACLE/xdr/tspace/calltab11012.dbf’;
+alter database create datafile '/rtb/app/oracle/10.2.0/dbs/UNNAMED00127’ as '/rtb/xdr/u12/ORACLE/xdr/tspace/calltab21012.dbf’;
+alter database create datafile '/rtb/app/oracle/10.2.0/dbs/UNNAMED00128’ as '/rtb/xdr/u13/ORACLE/xdr/tspace/callind11012.dbf’;
+alter database create datafile '/rtb/app/oracle/10.2.0/dbs/UNNAMED00129’ as '/rtb/xdr/u13/ORACLE/xdr/tspace/callind211012.dbf’;
+
+alter database create datafile '/data/app/product/11.2.0/dbhome_2/dbs/UNNAMED00553’ as new ;-- since asm
+
+on standby
+
+3-	alter system set standby_file_management=manual;
+4-	alter database create datafile 'Unnamed datafile' as new
+5-	alter system set standby_file_management=AUTO;
+6-	alter database recover managed standby database using current logfile disconnect;

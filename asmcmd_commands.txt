@@ -1,0 +1,23 @@
+/u01/app/19.0.0/grid/bin/asmcmd --nocp -p ls -ls
+
+/u01/app/19.0.0/grid/bin/asmcmd --nocp -p lsdg :
+
+/u01/app/19.0.0/grid/bin/asmcmd --nocp -p lsct :
+
+
+ /u01/app/19.0.0/grid/bin/asmcmd --nocp -p lsdg 
+ 
+ /u01/app/19.0.0/grid/bin/asmcmd --nocp -p lsdsk 
+ 
+ /u01/app/19.0.0/grid/bin/asmcmd --nocp -p lsof
+ 
+  /u01/app/19.0.0/grid/bin/asmcmd --nocp -p lspwusr 
+  
+  /u01/app/19.0.0/grid/bin/asmcmd --nocp -p lstmpl 
+  
+   /u01/app/19.0.0/grid/bin/asmcmd --nocp -p spget 
+   
+   /u01/app/19.0.0/grid/bin/asmcmd --nocp -p dsget
+   
+   /u01/app/19.0.0/grid/bin/asmcmd --nocp -p iostat
+    /u01/app/19.0.0/grid/bin/asmcmd --nocp -p lsod

@@ -1,0 +1,2 @@
+ ps aux | grep weblogic.NodeManager
+ ps aux | grep soa_server4

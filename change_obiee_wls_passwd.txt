@@ -1,0 +1,50 @@
+Solution 	How To Reset Weblogic Password In Oracle Analytics Server(OAS) (Doc ID 2786135.1
+1. Stop all the services by running ./stop.sh
+
+2. Take a backup of complete Middleware Home.
+
+3. Start only AdminServer by using below command:  
+
+./start.sh -i AdminServer
+4. To be on safe side, create another administrator user similar to weblogic user.
+
+5. Log into Weblogic admin console and reset weblogic user's password.
+
+6. Navigate to [Middleware Home]/user_projects/domains/bi/servers/AdminServer/security and move below files to a different location outside Middleware Home for backup purpose.
+adminServerUserKey.properties
+adminServerUserConfig.properties
+
+7. Navigate to [Middleware Home]/user_projects/domains/bi/nodemanager and move below files to a different location outside Middleware Home for backup purpose.
+nmUserKey.properties
+nmUserConfig.properties
+
+8. Navigate to [Oracle Home]/oracle_common/common/bin/ and run below command:
+
+./wlst.sh
+9. Verify if nodemanager connection works fine with the old password and then disconnect.
+
+nmConnect('weblogic','<old password>','<hostname>','<nodemanager port>','<DOMAIN_NAME>','<DOMAIN_HOME>','ssl','true')
+nmDisconnect()
+10. Change nodemanager's password and update.  
+
+readDomain('<DOMAIN_HOME>')
+cd("/SecurityConfiguration/<DOMAIN_NAME>")
+cmo.setNodeManagerPasswordEncrypted("<new password>")
+updateDomain() 
+
+11. Verify if nmConnect() works fine with new password and then disconnect.
+
+nmConnect('weblogic','<new password>','<hostname>','<nodemanager port>','<DOMAIN_NAME>','<DOMAIN_HOME>','ssl','true')
+storeUserConfig(userConfigFile='<DOMAIN_HOME>/nodemanager/nmUserConfig.properties',userKeyFile='<DOMAIN_HOME>/nodemanager/nmUserKey.properties',nm='true')
+nmDisconnect()
+exit()
+12. Stop all the services by running ./stop.sh It will prompt to enter weblogic credentials. Please enter the new password.
+
+13. Rename tmp, cache and data directory under [Middleware Home]/user_projects/domains/bi/servers/bi_server1
+
+14. Start all the services by running below command. The parameter "-c" helps to clear the credentials in cache.
+
+./start.sh -c
+15. Verify the status by running ./status.sh
+
+16. Verify if /console and /analytics login works fine with the new password of weblogic user.

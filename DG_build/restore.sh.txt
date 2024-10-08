@@ -1,0 +1,5 @@
+#!/bin/bash
+export ORACLE_SID=PROD1CDB1
+export ORACLE_HOME=/u01/app/oracle/product/19.0.0/dbhome_1
+export PATH=$PATH:$ORACLE_HOME/bin
+rman  TARGET sys/wH0care#@PROD1DR_DG  AUXILIARY sys/wH0care#@PROD1CDB_DG msglog /home/oracle/rman_bkup.log cmdfile=/home/oracle/restore.cmd

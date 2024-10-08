@@ -1,0 +1,9 @@
+on slave: stop slave ;
+on slave: reset slave all ;
+on master: FLUSH TABLES WITH READ LOCK;
+on master: mysqldump -u root -p --all-databases --master-data > /data/dbdump.db
+on master: scp /data/dbdump.db imi-prd-ivrdb1:/data/
+on slave :CHANGE MASTER TO MASTER_HOST = '10.200.93.215',MASTER_USER = 'slaveuser', MASTER_PASSWORD = 'slaveuser', MASTER_LOG_FILE = 'mysql-bin.000133', MASTER_LOG_POS =452264996;
+on slave: start slave ;
+
+on master: UNLOCK TABLES;

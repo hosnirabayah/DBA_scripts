@@ -1,0 +1,16 @@
+RACLE_HOME=your_oracle_home
+ORACLE_SID=your_db_sid
+PATH=$ORACLE_HOME/bin:$PATH
+sqlplus /nolog
+SQL> conn / as sysdba
+alter session set "_oracle_script"=TRUE;
+SQL> spool remove_olap.log
+----> Remove OLAP Catalog
+SQL> @?/olap/admin/catnoamd.sql
+----> Remove OLAP API
+SQL> @?/olap/admin/catnoxoq.sql
+----> Deinstall APS - OLAP AW component
+SQL> @/u01/app/oracle/product/19.0.0/dbhome_1/rdbms/admin/catnoap.sql
+----> Recompile invalids
+SQL> @?/rdbms/admin/utlrp.sql
+SQL> spool off

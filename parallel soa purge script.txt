@@ -1,0 +1,59 @@
+DECLARE
+
+max_creation_date timestamp;
+min_creation_date timestamp;
+retention_period timestamp;
+BEGIN
+
+min_creation_date := to_timestamp('2015-05-01','YYYY-MM-DD');
+max_creation_date := to_timestamp('2015-12-31','YYYY-MM-DD');
+retention_period := to_timestamp('2016-01-01','YYYY-MM-DD');
+
+soa.delete_instances_in_parallel(
+min_creation_date => min_creation_date,
+max_creation_date => max_creation_date,
+batch_size => 10000,
+max_runtime => 60,
+retention_period => retention_period,
+DOP => 5,
+max_count => 1000000,
+purge_partitioned_component => false);
+
+END;
+-----------------------------------------
+or:
+----------------------------------------------------
+
+DECLARE
+
+max_creation_date timestamp;
+min_creation_date timestamp;
+batch_size integer;
+max_runtime integer;
+retention_period timestamp;
+DOP integer;
+max_count integer;
+purge_partitioned_component boolean;
+
+BEGIN
+min_creation_date := to_timestamp('2017-05-24','YYYY-MM-DD');
+max_creation_date := to_timestamp('2017-05-25','YYYY-MM-DD');
+max_runtime := 60;
+retention_period := to_timestamp('2017-05-25','YYYY-MM-DD');
+batch_size := 10000;
+DOP := 3;
+max_count := 1000000;
+purge_partitioned_component := (false);
+
+
+soa.delete_instances_in_parallel (
+min_creation_date => min_creation_date,
+max_creation_date => max_creation_date,
+batch_size => batch_size,
+max_runtime => max_runtime,
+retention_period => retention_period,
+DOP => DOP,
+max_count => max_count,
+purge_partitioned_component => purge_partitioned_component);
+
+END;

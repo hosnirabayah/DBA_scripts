@@ -1,0 +1,14 @@
+SELECT log_date,
+       owner,
+       job_name,
+       status
+       error,
+       req_start_date,
+       actual_start_date,
+       run_duration,
+       credential_owner,
+       credential_name,
+       additional_info
+FROM   dba_scheduler_job_run_details
+
+ORDER BY log_date;

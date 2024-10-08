@@ -1,0 +1,3 @@
+alter table SEHATI_STG_TPO."TransactionsIds" modify id generated always as identity (INCREMENT BY 1 CACHE 5000);
+
+select * from dba_tab_identity_cols where table_name = 'TransactionsIds'

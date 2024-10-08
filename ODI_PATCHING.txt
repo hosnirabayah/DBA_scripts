@@ -1,0 +1,8 @@
+ODI_ PATCH
+
+1- updoate java
+2- stop all WLS service
+3-patch weblogic
+4-patch cohernce
+5- update node manager ssl config
+6-start the services

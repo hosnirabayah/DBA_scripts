@@ -1,0 +1,23 @@
+select to_char(creation_time, 'RRRR Month') "Month",
+sum(bytes)/1024/1024/1024 "Growth in G"
+from sys.v$datafile
+where creation_time > SYSDATE-365
+group by to_char(creation_time, 'RRRR Month');
+
+
+select   obj.owner, obj.object_name,
+         to_char(sn.BEGIN_INTERVAL_TIME,'RRRR-MON-DD') start_day,
+         sum(a.SPACE_USED_DELTA)/(1024*1024) block_increase_mb
+from     dba_hist_seg_stat a,
+         dba_hist_snapshot sn,
+         dba_objects obj
+where    sn.snap_id = a.snap_id
+and      a.instance_number = sn.instance_number
+and      obj.object_id = a.obj#
+and      obj.owner not in ('SYS','SYSTEM')
+and      end_interval_time between to_timestamp('01-JAN-2023','DD-MON-RRRR')
+         and to_timestamp('01-FEB-2024','DD-MON-RRRR')
+        
+group by obj.owner, obj.object_name,
+         to_char(sn.BEGIN_INTERVAL_TIME,'RRRR-MON-DD')
+order by obj.owner, obj.object_name;

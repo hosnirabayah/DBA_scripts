@@ -1,0 +1,12 @@
+EXPLAIN PLAN  SET STATEMENT_ID = 'sql2' into   plan_table  FOR
+MERGE INTO claim d
+     USING (SELECT a.itemcode, b."BundleID" responsebundleid
+              FROM temp_code a,
+                   sehati_prod_tpo."ClaimResponse"@dwh_to_prdtpo b
+             WHERE a."ResourceID" = b."ResourceID") s
+        ON (d.responsebundleid = s.responsebundleid)
+WHEN MATCHED
+THEN
+    UPDATE SET d.itemcode = s.itemcode;
+
+SELECT * FROM table(DBMS_XPLAN.DISPLAY('plan_table', 'sql2','ALL'));

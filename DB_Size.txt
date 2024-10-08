@@ -1,0 +1,7 @@
+select (select sum(bytes/1048576) from dba_data_files) "Data Mb", 
+(select NVL(sum(bytes/1048576),0) from dba_temp_files) "Temp Mb",
+(select sum(bytes/1048576)*max(members) from v$log) "Redo Mb",
+(select sum(bytes/1048576) from dba_data_files) +
+(select NVL(sum(bytes/1048576),0) from dba_temp_files) +
+(select sum(bytes/1048576)*max(members) from v$log) "Total Mb"
+from dual;

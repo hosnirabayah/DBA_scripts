@@ -1,0 +1,6 @@
+https://updates.oracle.com/Orion/Services/download?type=readme&aru=25616565
+Patch 36440005: WLS PATCH SET UPDATE 12.2.1.4.240325
+ 
+steps:
+
+1- update the java

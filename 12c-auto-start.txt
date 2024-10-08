@@ -1,0 +1,2 @@
+crsctl status resource "ora.prdofm.db" -f | grep AUTO_START
+crsctl modify resource "ora.prdofm.db" -init -attr "AUTO_START=always"

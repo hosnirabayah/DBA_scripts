@@ -1,0 +1,87 @@
+Problem:
+
+ORA-00210: cannot open the specified control file
+ORA-00202: control file: '+DATA/kbazerdr/controlfile/current.256.825098041'
+ORA-17503: ksfdopn:2 Failed to open file +DATA/kbazerdr/controlfile/current.256.825098041
+ORA-15001: diskgroup "DATA" does not exist or is not mounted
+ORA-15077: could not locate ASM instance serving a required diskgroup
+ORA-205 signalled during: ALTER DATABASE MOUNT STANDBY DATABASE...
+
+Analyze:
+
+1) check if CRS is running on the node
+
+$ crsctl check crs
+CSS appears healthy
+CRS appears healthy
+EVM appears healthy
+
+2) check if ASM instance is running
+
+sys@+asm> select status from v$instance;
+STATUS
+————
+STARTED
+
+3) check diskgroup status
+
+bash-3.2$ ps -afe | grep smon
+ oracle 1788 1 0 Sep 24 ? 15:48 asm_smon_+ASM
+ oracle 2807 2799 0 20:33:44 pts/4 0:00 grep smon
+bash-3.2$ . oraenv
+ORACLE_SID = [KBAZER] ? +ASM
+The Oracle base remains unchanged with value /u01/app/oracle
+bash-3.2$ asmcmd
+ASMCMD> ls
+ASMCMD> 
+ASMCMD> 
+ASMCMD> exit
+bash-3.2$ 
+bash-3.2$ sqlplus / as sysasm
+SQL*Plus: Release 11.2.0.3.0 Production on Tue Mar 31 20:35:11 2015
+Copyright (c) 1982, 2011, Oracle. All rights reserved.
+Connected to:
+Oracle Database 11g Enterprise Edition Release 11.2.0.3.0 - 64bit Production
+With the Automatic Storage Management option
+SQL> 
+SQL> 
+SQL> select status from v$instance;
+
+STATUS
+------------
+STARTED
+
+SQL> select name, state from v$asm_diskgroup;
+
+NAME STATE
+------------------------------ -----------
+DATA DISMOUNTED
+ARCH DISMOUNTED
+
+SQL> show parameter asm_diskgroups;
+
+NAME TYPE VALUE
+------------------------------------ ----------- ------------------------------
+asm_diskgroups string ARCH
+
+Solution:
+
+1) manually mount the diskgroups (sqlplus / as sysasm)
+SQL> alter diskgroup DATA mount;
+Diskgroup altered.
+
+SQL> alter diskgroup ARCH mount;
+Diskgroup altered.
+
+SQL> select name, state from v$asm_diskgroup;
+
+NAME STATE
+------------------------------ -----------
+DATA MOUNTED
+ARCH MOUNTED
+
+SQL> show parameter asm_diskgroups;
+
+NAME TYPE VALUE
+------------------------------------ ----------- ------------------------------
+asm_diskgroups string ARCH, DATA

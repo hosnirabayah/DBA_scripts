@@ -1,0 +1,14 @@
+to connect jrockit mission control to weblogic::
+1- add below java option to $domain_home/startWeblogic.sh
+ 
+  DOMAIN_HOME="/swdata/TSTOFM/Middleware/domains/soa_domain"
+
+  JAVA_OPTIONS="-Djava.rmi.server.hostname=trngold1 -Xmanagement:ssl=false,authenticate=false,port=7091"
+   export JAVA_OPTIONS
+
+   ${DOMAIN_HOME}/bin/startWebLogic.sh $*
+   
+2 - stop all weblogic servers
+
+3- start weblogic from $domain_home/startWeblogic.sh
+4- start other managed servers

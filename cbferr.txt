@@ -1,0 +1,28 @@
+Click to add to Favorites		LGWR (ospid: Xxx): Terminating The Instance Due To Error 4021 (Doc ID 2177473.1)	To BottomTo Bottom	
+
+In this Document
+Symptoms
+Cause
+Solution
+References
+
+APPLIES TO:
+Oracle Database - Enterprise Edition - Version 11.2.0.4 and later
+Information in this document applies to any platform.
+SYMPTOMS
+ORA-04021: timeout occurred while waiting to lock object
+
+
+CAUSE
+Bug 18242740 ACTIVE STANDBY DATABASE CRASHED WITH ORA-4021 closed as duplicate of Bug 17018214 - ORA-600 [KRDRSB_END_QSCN_2]
+
+SOLUTION
+Fix is already included in 11.2.0.4 but the fix is DISABLED by default.
+
+To enable the fix  set "_adg_parselock_timeout" to the number of centi-seconds LGWR should wait before backing off and retrying the request.
+Set  the parameter "_adg_parselock_timeout" 
+
+
+On the Active Data Guard Standby set below parameter and restart standby:
+
+ALTER SYSTEM set "_adg_parselock_timeout"=550 scope=both;

@@ -1,0 +1,165 @@
+--------------------create new TS for 2024-----------------------------------------------------
+ CREATE TABLESPACE "TPO_TS_2024" DATAFILE '+DATA_DG' SIZE 32767M
+  LOGGING ONLINE PERMANENT BLOCKSIZE 8192
+  EXTENT MANAGEMENT LOCAL AUTOALLOCATE
+  ENCRYPTION USING 'AES256' ENCRYPT DEFAULT   NO INMEMORY
+ ROW STORE COMPRESS ADVANCED  SEGMENT SPACE MANAGEMENT AUTO
+---------------------------------------------------------------------------------------------------
+----------------grant unlimited quota to new TS---------------------------------------------------
+----------------------move 2024 empty partitions to the new TS ------------------------------------
+    /* Formatted on 22-Nov-2023 11:46:43 (QP5 v5.206) */
+  DECLARE
+        statmn   NVARCHAR2 (2000);
+    BEGIN
+        FOR i
+            IN (SELECT DISTINCT (table_name) tb
+                  FROM dba_tab_partitions
+                 WHERE     table_owner = 'SEHATI_PROD_TPO'
+                       AND tablespace_name = 'TPO_TS' --AND table_name IN ('Patient', 'ClaimRequestEncounter')
+                                                     )
+        LOOP
+            FOR x
+                IN (SELECT distinct(partition_name)
+                      FROM dba_tab_partitions
+                     WHERE    
+                          TO_DATE (SUBSTR (partition_name, -8), 'YYYYMMDD') >= 
+                                   TO_DATE (20240201, 'YYYYMMDD')
+                                    AND TO_DATE (SUBSTR (partition_name, -8), 'YYYYMMDD') <= TO_DATE (20250101, 'YYYYMMDD')
+    /*ADVICE(17): Functions with constant parameters in WHERE clause [317] */
+                       AND partition_name LIKE 'P_DATE_TO_2%'
+                           AND tablespace_name = 'TPO_TS' and table_owner = 'SEHATI_PROD_TPO' and table_name=i.tb)
+            LOOP
+    /*ADVICE(21): Nested LOOPs should all be labeled [406] */
+                statmn :=
+                       'ALTER TABLE SEHATI_PROD_TPO."'
+                    || i.tb
+                    || '" MOVE PARTITION '
+                    || x.partition_name
+                    || ' TABLESPACE TPO_TS_2024 ;';
+                DBMS_OUTPUT.put_line (statmn);
+            -- execute immediate statmn ;
+            END LOOP;
+        END LOOP;
+    END;
+--------------------------------------------------------------------------------------
+------------------PARTITIONS Check after move----------------------------
+
+ select partition_name, tablespace_name 
+    from dba_tab_partitions 
+    where table_owner ='SEHATI_TEST_TPO'
+     and  partition_name  like 'P_DATE_TO_2024%' and partition_name <> 'P_DATE_TO_20240101'
+and tablespace_name <> 'TPO_TS_2024' 
+
+SELECT partition_name, compression, compress_for
+  FROM dba_tab_partitions
+ WHERE                                                  --table_name='Patient'
+      partition_name LIKE 'P_DATE_TO_2024%'
+       AND compression <> 'ENABLED'
+       AND compress_for <> 'ADVANCED'
+
+
+
+---------------------------------------------------------------------------------------
+----------------move 2024 empty LOBs Partitions----------------------------------------
+DECLARE
+    statmn   NVARCHAR2 (2000);
+BEGIN
+    FOR i
+        IN (SELECT DISTINCT (table_name)
+              FROM dba_lob_partitions
+             WHERE     table_owner = 'SEHATI_PROD_TPO' and  tablespace_name <> 'TPO_TS_2024')
+    LOOP
+        FOR x
+            IN (SELECT partition_name, lob_partition_name,column_name,tablespace_name
+                  FROM dba_lob_partitions
+                 WHERE     table_name = i.table_name
+                       AND TO_DATE (SUBSTR (partition_name, -8), 'YYYYMMDD') >=
+                               TO_DATE (20240201, 'YYYYMMDD')
+                               AND TO_DATE (SUBSTR (partition_name, -8), 'YYYYMMDD') <= TO_DATE (20250101, 'YYYYMMDD')
+/*ADVICE(16): Functions with constant parameters in WHERE clause [317] */
+                       AND partition_name LIKE 'P_DATE_TO_202%' and tablespace_name <> 'TPO_TS_2024' 
+                       and table_owner = 'SEHATI_PROD_TPO' )
+        LOOP
+/*ADVICE(19): Nested LOOPs should all be labeled [406] */
+            statmn :=
+                   'ALTER TABLE SEHATI_PROD_TPO."'
+                || i.table_name
+                || '" MOVE PARTITION '
+                || x.partition_name
+                ||' LOB("'
+                ||x.column_name
+                ||'")'
+                || ' store as ( TABLESPACE TPO_TS_2024 ) '
+                || ';';
+            DBMS_OUTPUT.put_line (statmn);
+        END LOOP;
+    END LOOP;
+END;
+------------------------------------------------------------------------------------------
+------------------------move LOB part Indexes--------------------------------------------
+
+moving 
+-------------------------------------------------------------------------------------------
+------------LOBS PART Check after move---------------------------------------------------
+ select partition_name, lob_partition_name, tablespace_name ,column_name
+    from dba_lob_partitions 
+    where table_owner ='SEHATI_TEST_TPO'
+     and  partition_name  like 'P_DATE_TO_2024%' and partition_name <> 'P_DATE_TO_20240101'
+and tablespace_name <> 'TPO_TS_2024'
+
+ select partition_name, lob_partition_name, tablespace_name ,column_name,COMPRESSION   
+    from dba_lob_partitions 
+    where table_owner ='SEHATI_STG_TPO'
+     and  partition_name  like 'P_DATE_TO_2024%' and partition_name <> 'P_DATE_TO_20240101'
+and tablespace_name = 'TPO_TS_2024' and compression <> 'HIGH'
+-------------------------------------------------------------------------------------------
+
+select 'alter index SEHATI_TEST_TPO."'||index_name||'" rebuild partition '||partition_name||' tablespace tpo_ts_2024 ;',tablespace_name from dba_ind_partitions where index_owner = 'SEHATI_TEST_TPO'
+and partition_name like 'P_DATE_TO_2024%'
+
+/* Formatted on 11/30/2023 10:09:10 AM (QP5 v5.206) */
+SELECT    'alter index SEHATI_STG_TPO."'
+       || index_name
+       || '" rebuild partition '
+       || partition_name
+       || ' tablespace tpo_ts_2024 ;',
+       tablespace_name
+  FROM dba_ind_partitions
+ WHERE     index_owner = 'SEHATI_STG_TPO'
+       AND TO_DATE (SUBSTR (partition_name, -8), 'YYYYMMDD') > =
+                               TO_DATE (20240101, 'YYYYMMDD')
+                               AND TO_DATE (SUBSTR (partition_name, -8), 'YYYYMMDD') <= TO_DATE (20250101, 'YYYYMMDD')
+                               and partition_name like 'P_DATE_TO_20%' and tablespace_name <> 'TPO_TS_2024'
+-------------------------------------------------------------------
+compress indexes:
+
+SELECT    'alter index SEHATI_STG_TPO."'
+       || index_name
+       || '" rebuild partition '
+       || partition_name
+       || ' COMPRESS ADVANCED  high ;',
+       tablespace_name,compression
+  FROM dba_ind_partitions
+ WHERE     index_owner = 'SEHATI_STG_TPO'
+       AND TO_DATE (SUBSTR (partition_name, -8), 'YYYYMMDD') > =
+                               TO_DATE (20240101, 'YYYYMMDD')
+                               AND TO_DATE (SUBSTR (partition_name, -8), 'YYYYMMDD') <= TO_DATE (20250101, 'YYYYMMDD')
+                               and partition_name like 'P_DATE_TO_20%' and tablespace_name = 'TPO_TS_2024'
+
+----------------------------------------------------------------------------------------------------------------
+-----------------indexes check------------------------------------------
+/* Formatted on 11/30/2023 11:06:17 AM (QP5 v5.206) */
+SELECT 'alter index SEHATI_STG_TPO.' || index_name || ' rebuild;' script, i.*
+  FROM dba_indexes i
+ WHERE status NOT IN ('VALID', 'N/A', 'USABLE');
+
+SELECT index_name,
+       partition_name,
+          'alter index SEHATI_STG_TPO.'
+       || index_name
+       || ' rebuild partition '
+       || partition_name
+       || ';',
+       status
+  FROM dba_ind_partitions
+ WHERE status NOT IN ('VALID', 'N/A', 'USABLE');

@@ -1,0 +1,2 @@
+create table rafm.rest_ROAM_PER_SUBS_USAGE as select * from rafm.ROAM_PER_SUBS_USAGE as of timestamp systimestamp - interval '1' hour
+where partition_key > SYSDATE-91

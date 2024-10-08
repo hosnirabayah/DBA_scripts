@@ -1,0 +1,14 @@
+sELECT    'alter table DWHUSER_TMB.'
+       || '"'
+       || table_name
+       || '"'
+       || ' modify PARTITION BY RANGE ("'||column_name||'")'||'  ( PARTITION P_DATE_TO_20210101 
+VALUES LESS THAN (TIMESTAMP '
+/*ADVICE(10): Literal string contains a new-line or other unprintable
+                  character [106] */
+       || ''''
+       || '2021-01-01 00:00:00'
+       || ''''
+       || ')) parallel 16 ;'
+from   dba_tab_cols a where lower(a.column_name)
+= 'createdat' and owner = 'DWHUSER_TMB' and table_name not in (select view_name from dba_views where owner = 'DWHUSER_TMB')

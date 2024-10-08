@@ -1,0 +1,6 @@
+run
+{
+ALLOCATE CHANNEL CH1 TYPE 'SBT_TAPE';
+send 'SBT_PARMS=(NSR_SERVER=wp-emc-nw.wataniya-palestine.com,NSR_CLIENT=cbfdb2-vip.wataniya-palestine.com)';
+restore archivelog from logseq 367472 until logseq 367480 thread=1;
+}

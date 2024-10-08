@@ -1,0 +1,25 @@
+ELECT    'alter table SEHATI_TEST_TPO.'
+       || '"'
+       || table_name
+       || '"'
+       || ' modify PARTITION BY RANGE ("CreatedAt")INTERVAL( NUMTODSINTERVAL(7, '
+       || ''''
+       || 'DAY'
+       || ''''
+       || ' )) ( PARTITION FIRST_PART 
+VALUES LESS THAN (TIMESTAMP '
+/*ADVICE(10): Literal string contains a new-line or other unprintable
+                  character [106] */
+       || ''''
+       || '0001-01-01 00:00:00'
+       || ''''
+       || ')) parallel 16 ;'
+  FROM dba_tab_cols
+ WHERE     owner = 'SEHATI_TEST_TPO' --and table_name not in 
+ --('CoverageEligibilityResponseErrorNotice','ClaimResponseGenerated',
+-- 'ClaimRequestContent','AuthorizationResponseGenerated')
+       AND column_name = 'CreatedAt'
+       AND table_name NOT IN (SELECT DISTINCT (table_name)
+                                FROM dba_tab_partitions
+                               WHERE owner = 'SEHATI_TEST_TPO')
+       AND table_name NOT LIKE 'BIN$%';

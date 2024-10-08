@@ -1,0 +1,1 @@
+add permision on primery then switch log file to secondery

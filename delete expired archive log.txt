@@ -1,0 +1,5 @@
+RMAN>list expired archivelog all;
+
+RMAN>crosscheck archivelog all;
+
+RMAN>delete noprompt expired archivelog all;

@@ -1,0 +1,17 @@
+
+select 'alter system kill session '||''''||s.sid||','||s.serial#||','||'@'||s.inst_id||''''||' immediate ;','SID:'||s.sid||',
+SERIAL#:'||s.serial#||',
+USERNAME:'||s.username||',
+OSUSER:'||s.osuser||',
+MACHINE:'||s.machine||',
+PROGRAM:'||s.program||',
+HASHVALUE:'||s.sql_hash_value||',
+SQL_ID'||s.sql_id||',
+SQL TEXT:'||sql.sql_text ||',
+ELAPSED TIME:'|| last_call_et
+from gv$session s
+left outer join gv$sql sql on sql.hash_value=s.sql_hash_value and sql.address=s.sql_address
+where s.status='ACTIVE'
+and s.type <> 'BACKGROUND'
+--and username in ('OPS\$SAVPRD1L')
+and last_call_et >= 60;

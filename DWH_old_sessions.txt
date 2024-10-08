@@ -1,0 +1,5 @@
+select sql_id, sql_text,first_load_time from gv$sql where to_date(substr(first_load_time,0,10),'yyyy-mm-dd')  <= trunc(sysdate-10/24)
+AND 
+parsing_schema_name NOT IN ('PRD_TAQWADI','ESS_OPERATION','PRD_ABDALLAHDI','BO_BODS_PROD','BO_PROD','PRD_HASANDI','BO_BODS_TEST','SYS','NOC') 
+
+AND SQL_TEXT NOT LIKE '%CMC%' and SQL_TEXT NOT LIKE '%CMS%' and sql_id in (select sql_id from gv$session)

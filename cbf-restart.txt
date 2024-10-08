@@ -1,0 +1,5 @@
+local_listener                       string      (ADDRESS=(PROTOCOL=TCP)(HOST=1
+                                                 0.200.70.169)(PORT=1521))
+
+
+alter system set local_listener='(ADDRESS=(PROTOCOL=TCP)(HOST=10.200.70.169)(PORT=1521))'

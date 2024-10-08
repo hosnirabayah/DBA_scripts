@@ -1,0 +1,14 @@
+
+alter system set SGA_MAX_SIZE=6G scope=spfile;
+
+
+alter system set SGA_TARGET=6G scope=spfile;
+
+
+
+update /u02/app/product/11.2.0/dbhome_1/dbs/initDBname
+
+set memory_target=sga_target
+
+then restart
+

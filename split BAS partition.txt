@@ -1,0 +1,62 @@
+
+call mohammad abdullah  0568560605
+backup 
+1- expdp hrabaya tables=BAS.LC_SOLD_COMPONENT_TBL directory=backup dumpfile=LC_SOLD_COMPONENT_TBL.dmp logfile=LC_SOLD_COMPONENT_TBL.log
+
+2- create table hrabaya.PERSONAL_OPTION_ATTRIB_TBL_BKP as select * from BAS.PERSONAL_OPTION_ATTRIB_TBL;
+
+3- make sure bas app stoped
+   
+   select * from v$session where USERNAME='BAS'; -- must return no   
+27-APR-17 02.44.07.548221 AM +03:0
+SELECT CURRENT_TIMESTAMP FROM DUAL; -- record it
+exec dbms_stats.gather_table_stats('BAS', 'LC_SOLD_COMPONENT_TBL', granularity => 'SUBPARTITION', partname => 'SP_PAST_DATE_TO_20170228');
+
+talter table BAS.PERSONAL_OPTION_ATTRIB_TBL split partition P_DATE_OTHER at (to_date('2017-03-01','yyyy-mm-dd')) into (partition P_DATE_TO_20170228, partition P_DATE_OTHER);
+
+alter table BAS.PERSONAL_OPTION_ATTRIB_TBL split partition P_DATE_OTHER at (to_date('2017-04-01','yyyy-mm-dd')) into (partition P_DATE_TO_20170331, partition P_DATE_OTHER);
+
+alter table BAS.PERSONAL_OPTION_ATTRIB_TBL split partition P_DATE_OTHER at (to_date('2017-05-01','yyyy-mm-dd')) into (partition P_DATE_TO_20170430, partition P_DATE_OTHER);
+
+
+
+alter table BAS.LC_SOLD_COMPONENT_TBL split subpartition SP_PAST_DATE_OTHER at (to_date('2017-03-01','yyyy-mm-dd')) into (subpartition SP_PAST_DATE_TO_20170228, subpartition SP_PAST_DATE_OTHER);
+
+alter table BAS.LC_SOLD_COMPONENT_TBL split subpartition SP_PAST_DATE_OTHER at (to_date('2017-04-01','yyyy-mm-dd')) into (subpartition SP_PAST_DATE_TO_20170331, subpartition SP_PAST_DATE_OTHER);
+
+alter table BAS.LC_SOLD_COMPONENT_TBL split subpartition SP_PAST_DATE_OTHER at (to_date('2017-05-01','yyyy-mm-dd')) into (subpartition SP_PAST_DATE_TO_20170430, subpartition SP_PAST_DATE_OTHER);
+
+
+check indexes after each split
+
+select 'alter index bas.'||index_name||' rebuild;' script, i.* from dba_indexes i where status not in('VALID','N/A','USABLE')
+
+select index_name, partition_name, 
+'alter index bas.'||index_name||' rebuild partition '||partition_name||';', status from dba_ind_partitions where status not in('VALID','N/A','USABLE');
+
+subpartition indexes check
+SELECT s.status,
+       s.index_name,
+       s.partition_name,
+       s.subpartition_name
+  FROM dba_ind_subpartitions s
+WHERE index_name IN
+           (SELECT index_name
+              FROM dba_indexes
+            )
+            and status <> 'USABLE' ;
+
+select * from dba_objects where status= 'INVALID'
+
+Validate the result:
+
+select count(*) from PERSONAL_OPTION_ATTRIB_TBL partition(P_DATE_OTHER); </SQL> This is expected to deliver 0 records.
+
+select count(*) from LC_SOLD_COMPONENT_TBL subpartition(SP_PAST_DATE_OTHER); </SQL> This is expected to deliver 0 records.
+
+after each split run below query:
+ EXEC DBMS_STATS.gather_table_stats('BAS', 'LC_SOLD_COMPONENT_TBL');
+exec dbms_stats.unlock_table_stats ('BAS', 'LC_SOLD_COMPONENT_TBL');
+analyze table bas.LC_SOLD_COMPONENT_TBL subpartition(SP_PAST_DATE_TO_20170331) compute statistics;
+ 
+ 

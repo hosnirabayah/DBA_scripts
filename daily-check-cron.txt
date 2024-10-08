@@ -1,0 +1,30 @@
+ORACLE_SID=PRDCTLG
+ORACLE_BASE=/u02/app/product
+ORACLE_HOME=/u02/app/product/12c/dbhome_1
+ORACLE_HOSTNAME=profmoradb1.wataniya-palestine.com
+#NLS_LANG=American_America.US7ASCII
+NLS_LANG=American_America.AL32UTF8
+NLS_LENGTH_SEMANTICS=CHAR
+PATH=$ORACLE_HOME/bin:$PATH:/usr/local/bin
+EDITOR=vi
+VISUAL=vi
+TERM=vt100
+ORACLE_TERM=vt100
+EXTPROC_DLLS=ANY
+#NLS_LANG=American_America.US7ASCII
+LD_LIBRARY_PATH=$ORACLE_HOME/lib32
+LD_LIBRARY_PATH_64=$ORACLE_HOME/lib
+export ORACLE_SID ORACLE_BASE ORACLE_HOME NLS_LANG PATH EDITOR VISUAL
+export LD_LIBRARY_PATH LD_LIBRARY_PATH_64 TERM ORACLE_TERM NLS_LENGTH_SEMANTICS ORACLE_HOSTNAME
+cd /home/oracle/dba_scripts
+rm -f daily_check_PRDOFM.txt
+if  ps -ef | grep ora_ | grep PRDCTLG ; then
+sqlplus / as sysdba  << %
+@spool.sh;
+%
+cat daily_check_PRDOFM.txt | mailx -s "PRDCTLG Daily Check" Husni.Rabaya@wataniya.ps
+cat daily_check_PRDOFM.txt | mailx -s "PRDCTLG Daily Check" salah.musleh@wataniya.ps
+cat daily_check_PRDOFM.txt | mailx -s "PRDCTLG Daily Check" hani.darabie@wataniya.ps
+cat daily_check_PRDOFM.txt | mailx -s "PRDCTLG Daily Check" fatma.farahti@ooredoo.ps
+fi
+exit

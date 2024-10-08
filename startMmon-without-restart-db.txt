@@ -1,0 +1,9 @@
+grant restricted session to public;
+
+alter system enable restricted session;
+ 
+alter system disable restricted session;
+
+revoke restricted session from  public;
+ 
+ps -ef | grep mmon

@@ -1,0 +1,24 @@
+login as root and export grid home and sid
+asmcmd
+
+asmcmd afd_lsdsk
+
+afd_label DATA10 /dev/sds1
+afd_label DATA11 /dev/sdt1
+afd_label DATA12 /dev/sdu1
+afd_label DATA13 /dev/sdv1
+afd_label DATA14 /dev/sdw1
+
+
+
+
+switch to grid
+
+
+
+sqlplus / as sysasm
+alter diskgroup DATA_DG add disk  'AFD:DATA10';
+alter diskgroup DATA_DG add disk  'AFD:DATA11';
+alter diskgroup DATA_DG add disk  'AFD:DATA12';
+alter diskgroup DATA_DG add disk  'AFD:DATA13';
+alter diskgroup DATA_DG add disk  'AFD:DATA14';

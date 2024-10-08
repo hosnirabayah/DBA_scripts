@@ -1,0 +1,78 @@
+Start and mount the physical standby database:
+
+SQL> STARTUP MOUNT;
+Start Redo Apply or real-time apply:
+
+T
+To start real-time apply, issue the following statement:
+ALTER DATABASE RECOVER MANAGED STANDBY DATABASE cancel
+SELECT OPEN_MODE FROM V$DATABASE; 
+
+SQL> ALTER DATABASE RECOVER MANAGED STANDBY DATABASE USING CURRENT LOGFILE disconnect;
+
+
+select PROCESS,CLIENT_PROCESS,THREAD#,SEQUENCE#,BLOCK# from v$managed_standby where process = 'MRP0' or client_process='LGWR';
+
+
+column deleted format a7
+column reclaimable format a11
+set linesize 120
+select applied,deleted,backup_count
+ ,decode(rectype,11,'YES','NO') reclaimable,count(*)
+ ,to_char(min(completion_time),'dd-mon hh24:mi') first_time
+ ,to_char(max(completion_time),'dd-mon hh24:mi') last_time
+ ,min(sequence#) first_seq,max(sequence#) last_seq
+from v$archived_log left outer join sys.x$kccagf using(recid)
+where is_recovery_dest_file='YES'
+group by applied,deleted,backup_count,decode(rectype,11,'YES','NO') order by min(sequence#)
+*********************************************************************************************************
+check last upply log
+select SEQUENCE#,  APPLIED,COMPLETION_TIME from V$ARCHIVED_LOG  where  APPLIED like'%NO%' order by COMPLETION_TIME desc;
+****************************************************************************************************
+select PROCESS,CLIENT_PROCESS,THREAD#,SEQUENCE#,BLOCK# from v$managed_standby where process = 'MRP0' or client_process='LGWR';
+********************************************************************************************************************************
+
+select SEQUENCE#,  APPLIED,COMPLETION_TIME from V$ARCHIVED_LOG order by COMPLETION_TIME desc
+
+
+select * from v$log; kAK
+
+ select * from v$recovery_area_usage where file_type = 'ARCHIVED LOG';
+
+     select thread#,max(sequence#) from v$archived_log group by thread#;
+     
+     select PROCESS,CLIENT_PROCESS,THREAD#,SEQUENCE#,BLOCK# from v$managed_standby where process = 'MRP0' or client_process='LGWR';
+     
+     select group#,thread#,sequence#,bytes,archived,status from v$log; 
+
+select group#,sequence#,bytes,used,archived,status from v$standby_log;
+
+select
+    name,
+  floor(space_limit / 1024 / 1024/1024) Siz,
+  (space_used / 1024 / 1024/1024) Used
+from
+   v$recovery_file_dest
+order by name;
+
+rman TARGET sys/wH0care#@PROD1CDB_DG AUXILIARY sys/wH0care#@PROD1DR_DG
+
+run {
+    allocate channel Ch1 TYPE 'SBT_TAPE' PARMS 'SBT_LIBRARY=/opt/veeam/VeeamPluginforOracleRMAN/libOracleRMANPlugin.so';
+    set archivelog destination to '+RECO_DG';
+    restore archivelog from logseq=47462 until logseq=47484 thread 1;
+    release channel Ch1;
+    }
+    
+    
+    
+    run {
+    allocate channel Ch1 TYPE 'SBT_TAPE' PARMS 'SBT_LIBRARY=/opt/veeam/VeeamPluginforOracleRMAN/libOracleRMANPlugin.so';
+    set archivelog destination to '+RECO_DG';
+    restore archivelog logseq=32330 thread 2;
+    release channel Ch1;
+    }
+
+select PROCESS,STATUS,THREAD#,SEQUENCE# from gv$managed_standby ;
+	
+

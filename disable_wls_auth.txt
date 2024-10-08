@@ -1,0 +1,7 @@
+Navigate to the following WebLogic directory:
+<WebLogic installation directory>/user_projects/domains/<user domain>/config
+Open the config.xml file in a text editor.
+Add the following element within the <security-configuration> element:
+<enforce-valid-basic-auth-credentials>
+   false
+</enforce-valid-basic-auth-credentials>

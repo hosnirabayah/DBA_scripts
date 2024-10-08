@@ -1,0 +1,11 @@
+select round((count(ash.sample_id) / ((CAST(end_time.sample_time AS DATE) - CAST(start_time.sample_time AS DATE))*24*60*60)),2) as AAS 
+from
+    (select min(sample_time) sample_time 
+    from  v$active_session_history ash 
+    ) start_time,
+    (select max(sample_time) sample_time
+    from  v$active_session_history 
+    ) end_time,
+    v$active_session_history ash
+where ash.sample_time between start_time.sample_time and end_time.sample_time
+group by end_time.sample_time,start_time.sample_time;

@@ -1,0 +1,74 @@
+keytool -genkey -alias clusterkey -keyalg RSA -keysize 2048 -sigalg SHA256withRSA -validity 3650 -keypass PaS@123 -keystore clusterkeystore.jks -ext "SAN=dns:PR-ODI01.SehatiCP.local,dns:PR-ODI02.SehatiCP.local" -dname "CN=CN=PR-ODI01.SehatiCP.local, OU=WebLogicCluster, O=Sehati, L=Riyadh, ST=CA, C=SA" -storepass PaS@123
+keytool  -export -alias clusterkey -file root.crt -keystore clusterkeystore.jks -ext "SAN=dns:PR-ODI01.SehatiCP.local,dns:PR-ODI02.SehatiCP.local" -storepass PaS@123
+keytool -import -alias clusterkey -file root.crt -keystore /home/oracle/Oracle/Middleware/Oracle_Home/wlserver/server/lib/MyODItrust.jks -storepass PaS@123
+
+
+
+# Specify the keystore file and password
+export JAVA_OPTS="-Djavax.net.ssl.keyStore=/home/oracle/Oracle/user_projects/domains/base_domain/keystores/MyKeyStore.jks"
+export JAVA_OPTS="$JAVA_OPTS -Djavax.net.ssl.keyStorePassword=Welcome1"
+export JAVA_OPTS="$JAVA_OPTS -Djavax.net.ssl.trustStore=/home/oracle/Oracle/wlserver/server/lib/MyTrustStore.jks"
+export JAVA_OPTS="$JAVA_OPTS -Djavax.net.ssl.trustStorePassword=Welcome1"
+
+
+openssl s_client -connect stg-odi01.sehatics.local:15102
+echo -n | openssl s_client -connect stg-odi01.sehatics.local:15102 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > server_cert.pem
+keytool -importcert -file server_cert.pem -keystore /path/to/your/truststore.jks -alias stg-odi01
+keytool -importcert -file server_cert.pem -keystore $JAVA_HOME/jre/lib/security/cacerts -alias stg-odi01
+keytool -list -v -keystore /path/to/your/truststore.jks
+
+
+Steps to Resolve the SSL Handshake Exception
+Here’s a step-by-step approach to troubleshoot and resolve this issue:
+
+1. Check the Server Certificate
+First, confirm whether the server certificate is valid and if it's signed by a trusted Certificate Authority (CA). Use the following command to fetch and display the certificate:
+
+bash
+Copy code
+openssl s_client -connect stg-odi01.sehatics.local:15102
+Look for lines that start with -----BEGIN CERTIFICATE----- and -----END CERTIFICATE-----. You can also check if there are any warnings or errors during the connection.
+
+2. Download the Certificate
+If the certificate is self-signed or not trusted by default, you'll need to download it. You can extract it using:
+
+bash
+Copy code
+echo -n | openssl s_client -connect stg-odi01.sehatics.local:15102 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > server_cert.pem
+3. Import the Certificate into the Truststore
+Import the downloaded certificate into your Java truststore using the keytool command. If you are using the default Java truststore, the path is typically $JAVA_HOME/jre/lib/security/cacerts. Here’s how to do that:
+
+bash
+Copy code
+keytool -importcert -file server_cert.pem -keystore /path/to/your/truststore.jks -alias stg-odi01
+If using the default Java truststore, the command would be:
+bash
+Copy code
+keytool -importcert -file server_cert.pem -keystore $JAVA_HOME/jre/lib/security/cacerts -alias stg-odi01
+You will be prompted for a password. The default password is changeit.
+4. Verify the Import
+You can check if the certificate was successfully imported by listing the contents of the truststore:
+
+bash
+Copy code
+keytool -list -v -keystore /path/to/your/truststore.jks
+5. Ensure Java is Pointing to the Correct Truststore
+Make sure that the startloadplan.sh script points to the updated truststore. In your script, set the following environment variables if you haven’t already:
+
+bash
+Copy code
+export JAVA_OPTS="-Djavax.net.ssl.trustStore=/path/to/your/truststore.jks"
+export JAVA_OPTS="$JAVA_OPTS -Djavax.net.ssl.trustStorePassword=your_truststore_password"
+6. Restart the ODI Agent
+After making the above changes, restart the ODI agent to ensure that it picks up the updated truststore.
+
+7. Test the Load Plan Again
+Run the Load Plan again with the updated settings:
+
+bash
+Copy code
+/home/oracle/Oracle/user_projects/domains/base_domain/bin/startloadplan.sh LP_NHIC_LOGGING GLOBAL 6 "-INSTANCE=OracleDIAgent1" "-AGENT_URL=https://stg-odi01.sehatics.local:15102/oraclediagent/"
+Additional Considerations
+Intermediate Certificates: If the server’s certificate is signed by an intermediate CA, ensure that all intermediate certificates are also imported into the truststore.
+Firewall and Network Issues: Make sure there are no network issues preventing access to the server.
+Java Version Compatibility: Check that your Java version is up to date, as older versions might have compatibility issues with modern SSL/TLS standards.

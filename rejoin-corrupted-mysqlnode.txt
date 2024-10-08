@@ -1,0 +1,11 @@
+1- remove the instance : cluster.removeInstance("repuser@op-prdmobdb1:3306", {force:true})
+2- take MEB from any secondery node :/mysqlbackup --user=root --password=TooR_2021 --host=localhost --backup-dir=/mysql_backup/op-prdmobdb1 backup-and-apply-log --with-timestamp
+3- stop the corrupted mysql service 
+4- remove all data files (/db/data/mysql)
+5- restore the db from the backup taken on secondery node: mysqlbackup --defaults-file=/etc/my.cnf --backup-dir=/mysql_backup/op-prdmobdb1/2022-07-25_10-57-08 copy-back
+6- stop the slave on the crashed node
+7- reset slave all on crashed node
+8- dba.checkInstanceConfiguration("repuser@op-prdmobdb1")
+9- dba.configureInstance('repuser@op-prdmobdb1')
+10 - cluster.addInstance("repuser@op-prdmobdb1:3306", {force:true}) 
+11- validate the aded node status by mysql> SELECT member_host, member_port, member_state, member_role FROM performance_schema.replication_group_members;

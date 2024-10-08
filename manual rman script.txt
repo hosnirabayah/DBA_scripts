@@ -1,0 +1,18 @@
+RUN { 
+ALLOCATE CHANNEL CH1 TYPE DISK FORMAT '/oraclebackup/arch_bkp/DB_%U'; 
+ALLOCATE CHANNEL CH2 TYPE DISK FORMAT '/oraclebackup/arch_bkp/DB_%U' ; 
+ALLOCATE CHANNEL CH3 TYPE DISK FORMAT '/oraclebackup/arch_bkp/DB_%U'; 
+ALLOCATE CHANNEL CH4 TYPE DISK FORMAT '/oraclebackup/arch_bkp/DB_%U' ; 
+ALLOCATE CHANNEL CH5 TYPE DISK FORMAT '/oraclebackup/arch_bkp/DB_%U'; 
+ALLOCATE CHANNEL CH6 TYPE DISK FORMAT '/oraclebackup/arch_bkp/DB_%U' ; 
+
+BACKUP filesperset 1 archivelog all delete input;
+
+RELEASE CHANNEL CH1; 
+RELEASE CHANNEL CH2; 
+RELEASE CHANNEL CH3; 
+RELEASE CHANNEL CH4; 
+RELEASE CHANNEL CH5; 
+RELEASE CHANNEL CH6; 
+}
+

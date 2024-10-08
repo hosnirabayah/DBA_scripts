@@ -1,0 +1,34 @@
+
+1- on both CDBs:
+
+CREATE USER c##remote_clone_user IDENTIFIED BY remote_clone_user CONTAINER=ALL;
+GRANT CREATE SESSION, SYSOPER, CREATE PLUGGABLE DATABASE TO c##remote_clone_user CONTAINER=ALL;
+
+2- check local undo for the pdb want to move should be true:
+
+COLUMN property_name FORMAT A30
+COLUMN property_value FORMAT A30
+
+SELECT property_name, property_value
+FROM   database_properties
+WHERE  property_name = 'LOCAL_UNDO_ENABLED';
+
+PROPERTY_NAME                  PROPERTY_VALUE
+------------------------------ ------------------------------
+LOCAL_UNDO_ENABLED             TRUE
+
+
+3- add the tnsname for the pdb want to move on the tagret distination server
+
+4- create dblink on the target destination:
+CREATE PUBLIC DATABASE LINK clone_link CONNECT TO c##remote_clone_user IDENTIFIED BY remote_clone_user USING 'TESTCDB';
+test the link: DESC user_tables@clone_link
+
+5- create the pluggable
+
+6- open the pluggable
+7- fix patches conflict:
+$ORACLE_HOME/OPatch/datapatch -verbose
+8-run @utlrp.sql script
+9-close the relcoated pluggable
+10- open it again

@@ -1,0 +1,7 @@
+select path, free_mb,total_mb,state from v$asm_disk where group_number in (select group_number from 
+v$asm_diskgroup where name='DATA');
+-------------------------------------------------------------------------------------------------------
+
+alter diskgroup data check all repair;
+------------------------------------------------------------------------------------------------------
+select group_number, operation, state, error_code from v$asm_operation;

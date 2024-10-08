@@ -1,0 +1,17 @@
+SEHE1PRODSRV
+
+SEHE1PRODSRV
+
+srvctl add service -db PROD1CDB -service SEHE1PRODSRV -preferred PROD1CDB1,PROD1CDB2 -tafpolicy  BASIC -role PRIMARY -failovertype SELECT -failovermethod BASIC -failoverdelay 3 -failoverretry 10 -pdb SEHE1PROD
+
+srvctl start service -db PROD1CDB -service SEHE1PRODSRV
+
+alter system set db_create_online_log_dest_1 = '+RECO_DG' sid='*';
+
+srvctl stop service -d PROD1CDB -s sehe1prod -i PROD1CDB2
+
+srvctl stop service -d PROD1CDB -s sehe1prod -i PROD1CDB1
+
+srvctl stop instance -d PROD1CDB -i PROD1CDB1
+
+srvctl stop instance -d PROD1CDB -i PROD1CDB2

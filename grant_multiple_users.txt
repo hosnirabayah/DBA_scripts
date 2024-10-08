@@ -1,0 +1,15 @@
+DECLARE
+sql_stmt    VARCHAR2(500);
+begin
+FOR i IN (
+select  table_name from dba_tables where  owner = 'SEHATI_INTEGRATION' )
+LOOP
+FOR x IN (
+select  username from dba_users where  username in ('AMOHAMED','AMOHD','HABUZAHRA','KMASRI','TDEEK','MHASANEN','OBAZARAA','WALSALAMIN') )
+loop
+sql_stmt :='grant select on SEHATI_INTEGRATION."'||i.table_name||'" to '||x.username||' ;';
+dbms_output.put_line(sql_stmt);
+END LOOP;
+--execute immediate sql_stmt ;
+END LOOP;
+END;

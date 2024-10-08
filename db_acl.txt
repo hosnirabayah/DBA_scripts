@@ -1,0 +1,41 @@
+SELECT PRINCIPAL, HOST, lower_port, upper_port, acl, 'connect' AS PRIVILEGE, 
+    DECODE(DBMS_NETWORK_ACL_ADMIN.CHECK_PRIVILEGE_ACLID(aclid, PRINCIPAL, 'connect'), 1,'GRANTED', 0,'DENIED', NULL) PRIVILEGE_STATUS
+FROM DBA_NETWORK_ACLS
+    JOIN DBA_NETWORK_ACL_PRIVILEGES USING (ACL, ACLID)  
+UNION ALL
+SELECT PRINCIPAL, HOST, NULL lower_port, NULL upper_port, acl, 'resolve' AS PRIVILEGE, 
+    DECODE(DBMS_NETWORK_ACL_ADMIN.CHECK_PRIVILEGE_ACLID(aclid, PRINCIPAL, 'resolve'), 1,'GRANTED', 0,'DENIED', NULL) PRIVILEGE_STATUS
+FROM DBA_NETWORK_ACLS
+    JOIN DBA_NETWORK_ACL_PRIVILEGES USING (ACL, ACLID);
+
+
+BEGIN
+DBMS_NETWORK_ACL_ADMIN.create_acl (
+acl => 'utl_http_siebel.xml',
+description => 'to acces OFM APIs',
+principal => 'SIEBEL',
+is_grant => TRUE,
+privilege => 'connect',
+start_date => SYSTIMESTAMP,
+end_date => NULL); COMMIT;
+END;
+
+
+BEGIN
+DBMS_NETWORK_ACL_ADMIN.assign_acl (
+acl => '/sys/acls/utl_http_siebel.xml',
+host => 'devofm01',
+lower_port => 1,
+upper_port => 8888);
+COMMIT;
+END;
+
+
+BEGIN
+DBMS_NETWORK_ACL_ADMIN.ADD_PRIVILEGE(
+acl => 'utl_http_siebel.xml',
+principal => 'SIEBEL',  --if you want user like 'HR' 
+is_grant => true,
+privilege => 'resolve');
+COMMIT;
+END;

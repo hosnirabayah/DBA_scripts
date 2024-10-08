@@ -1,0 +1,33 @@
+create a new directory
+
+/home/oracle/wallet1 
+
+create a new ssl wallet on above directory
+
+orapki wallet export -wallet /home/oracle/wallet1 -dn 'CN=sehati-finanace-scan,OU=IT, O=IQVIA, L=SA, ST=RY, C=KSA' -request /home/oracle/wallet1/server.csr -pwd welcome1
+
+orapki wallet export -wallet /home/oracle/wallet -dn 'CN=prd02-fin-scan,OU=IT, O=IQVIA, L=SA, ST=RY, C=KSA' -request /home/oracle/wallet/prd02-fin-scan.csr -pwd welcome1
+
+
+4. Create a wallet and import the root certs first and then intermediate certs (make sure to import root certs first)
+orapki wallet create -wallet /home/oracle/wallet1 welcome1
+orapki wallet add -wallet /home/oracle/wallet1 -trusted_cert -cert Sehati_Root_CA_2021-02-02.pem 
+orapki wallet add -wallet /home/oracle/wallet1 -trusted_cert -cert Sehati_issuing_CA_2021-02-02.pem
+
+
+Then add the user certificate here
+
+orapki wallet add -wallet /home/oracle/wallet1 -user_cert -cert  
+
+5. Verify if certs are in wallet
+cd to the wallet directory and run:
+orapki wallet display -wallet .
+
+Expiry Check :
+
+openssl pkcs12 -nokeys -info -in ewallet.p12 |openssl x509 -noout -subject -dates
+
+Doc ID 2927790.1 - For Certs renew
+
+orapki wallet display -wallet /home/oracle/wallet1 -pwd welcome1
+

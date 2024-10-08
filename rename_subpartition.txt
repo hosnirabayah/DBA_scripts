@@ -1,0 +1,30 @@
+create table tt as
+with xmlform as
+(
+select dbms_xmlgen.getxmltype('select table_name,partition_name ,subpartition_name,high_value from dba_tab_subpartitions where table_name=''TRANSACTION_QUEUE''') as x
+  from dual
+)
+select xmltab.*
+  from xmlform
+      ,xmltable('/ROWSET/ROW'
+          passing xmlform.x
+          columns table_name varchar2(40) path 'TABLE_NAME'
+          ,partition varchar2(40)  path 'partition_name'
+                 ,subpartition  varchar2(50)  path 'SUBPARTITION_NAME'
+                 ,high_value varchar2(85) path 'HIGH_VALUE'
+      ) xmltab;
+
+
+
+begin
+for i in (select partition_name,subpartition_name from dba_tab_subpartitions where table_owner = 'FRAUD_DB' and table_name = 'TRANSACTION_QUEUE')
+loop
+update tt set partition = i.partition_name where i.subpartition_name = subpartition;
+commit;
+end loop;
+end;
+
+select replace (SUBSTR(partition_name, -8), ' ', '') from dba_tab_partitions
+where table_owner = 'FRAUD_DB'
+select REGEXP_REPLACE(SUBSTR(partition_name, -8), '[^0-9A-Za-z]', '') from dba_tab_partitions
+where table_owner = 'FRAUD_DB'

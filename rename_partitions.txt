@@ -1,0 +1,45 @@
+
+CREATE TABLE SEHATI_PROD_TPO.PARTITIONS_RENAME
+(
+  TABLE_NAME  VARCHAR2(50 BYTE),
+  PARTITION   VARCHAR2(50 BYTE),
+  HIGH_VALUE  VARCHAR2(100 BYTE)
+)
+TABLESPACE TPO_TS
+RESULT_CACHE (MODE DEFAULT)
+PCTUSED    0
+PCTFREE    10
+INITRANS   1
+MAXTRANS   255
+STORAGE    (
+            INITIAL          64K
+            NEXT             1M
+            MAXSIZE          UNLIMITED
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+            FLASH_CACHE      DEFAULT
+            CELL_FLASH_CACHE DEFAULT
+           )
+LOGGING 
+NOCOMPRESS 
+NOCACHE
+NOPARALLEL
+MONITORING;
+
+
+
+insert into sehati_dev_tpo.partitions_rename SELECT * from (
+  SELECT table_name,PARTITION_NAME,
+    extractvalue
+      ( dbms_xmlgen.getxmltype
+        ( 'select high_value
+           from DBA_TAB_PARTITIONS where table_name = ''' || t.table_name || ''' and PARTITION_NAME = ''' || t.PARTITION_NAME || ''''),
+        '//text()' ) as high_value 
+  FROM DBA_TAB_PARTITIONS t
+  WHERE TABLE_OWNER = 'SEHATI_DEV_TPO' and partition_name like 'SYS%')
+--WHERE to_char(add_months(sysdate,-1),'SYYYYMMDD') < high_value;
+
+select 'alter table SEHATI_DEV_TPO."'||table_name||'" RENAME PARTITION '||PARTITION||' to P_DATE_TO_'||to_char(to_date (substr (high_value, 11, 11), 'YYYY-MM-DD'),'yyyymmdd')||' ;' from sehati_dev_tpo.partitions_rename
+select * from dba_tab_partitions where TABLE_OWNER = 'SEHATI_DEV_TPO' and partition_name like 'SYS%'

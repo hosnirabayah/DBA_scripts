@@ -1,0 +1,19 @@
+srvctl add service -db PROD1CDB -service SEHE1PRODSRV -preferred PROD1CDB1,PROD1CDB2 -tafpolicy  BASIC -role PRIMARY -failovertype SELECT -failovermethod BASIC -failoverdelay 3 -failoverretry 10 -pdb SEHE1PROD
+ 
+ 
+srvctl add service -db PROD1CDB -service PROD1METADRSRV -preferred PROD1CDB1,PROD1CDB2 -tafpolicy  BASIC -role PRIMARY -failovertype SELECT -failovermethod BASIC -failoverdelay 3 -failoverretry 10 -pdb PROD1METADR
+ 
+ 
+srvctl add service -db PROD1CDB -service PROD1METASRV -preferred PROD1CDB1,PROD1CDB2 -tafpolicy  BASIC -role PRIMARY -failovertype SELECT -failovermethod BASIC -failoverdelay 3 -failoverretry 10 -pdb PROD1META
+ 
+ 
+srvctl add service -db PROD1CDB -service SEHE1PRODSR -preferred PROD1CDB1,PROD1CDB2 -tafpolicy  BASIC -role PRIMARY -failovertype SELECT -failovermethod BASIC -failoverdelay 3 -failoverretry 10 -pdb sehe1prod
+ 
+ 
+ PROD1METADRSRV,PROD1METADR
+ 
+ PROD1METASRV,PROD1META
+ 
+ --SEHE1DR,sehe1prod
+ 
+ SEHE1PRODSR,sehe1prod

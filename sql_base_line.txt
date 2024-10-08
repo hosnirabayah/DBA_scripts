@@ -1,0 +1,41 @@
+DECLARE
+     
+    CNT NUMBER;
+     
+BEGIN
+    --Manuel plan loading
+    CNT := DBMS_SPM.LOAD_PLANS_FROM_CURSOR_CACHE(SQL_ID=>'9w59zzqy1z47g');
+ 
+END;
+
+SELECT ACCEPTED, ENABLED, FIXED, ORIGIN, SQL_HANDLE, PLAN_NAME FROM DBA_SQL_PLAN_BASELINES WHERE TRUNC(CREATED) = TRUNC(SYSDATE);
+DECLARE
+ 
+    L_PLANS_ALTERED  PLS_INTEGER;
+ 
+BEGIN
+ 
+    L_PLANS_ALTERED := DBMS_SPM.ALTER_SQL_PLAN_BASELINE(
+                                                        SQL_HANDLE      => 'SQL_e2131f5881eca70f',
+                                                        PLAN_NAME       => 'SQL_PLAN_f44szb20yt9sg975de6a9',
+                                                        ATTRIBUTE_NAME  => 'enabled',
+                                                        ATTRIBUTE_VALUE => 'NO'
+                                                       );
+ 
+    DBMS_OUTPUT.PUT_LINE('Plans Altered: ' || L_PLANS_ALTERED);
+ 
+END;
+
+DECLARE
+ 
+    CNT NUMBER;
+ 
+BEGIN
+ 
+    CNT := SYS.DBMS_SPM.LOAD_PLANS_FROM_CURSOR_CACHE(
+                                                     SQL_ID=>'9w59zzqy1z47g',
+                                                     PLAN_HASH_VALUE=>'3400609575',
+                                                     SQL_HANDLE=>'SQL_e2131f5881eca70f'
+                                                    );
+ 
+END;

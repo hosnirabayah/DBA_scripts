@@ -1,0 +1,7 @@
+create par file include the table as below:
+
+nclude=table:"IN (SELECT table_name FROM dba_tables where lower(table_name)='data_valuesetlist')"
+
+then run expdp as below:
+
+expdp hrabaya/HrB#Db_1@SEHE1PROD schemas=SEHATI_PROD_TPO parfile=parf dumpfile=Value1.dmp logfile=ex1.log directory=EXPORT

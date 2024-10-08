@@ -1,0 +1,1 @@
+tfactl run oratop -database prod1cdb

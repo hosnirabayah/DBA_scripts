@@ -1,0 +1,41 @@
+recover managed standby
+
+start shipping/applying logs
+
+
+
+
+
+
+show parameter pfile ;
+
+asmcmd
+ASMCMD>mkdir +DATA_DG/PARAM
+
+create pfile '/tmp/pfile.ora' from spfile
+
+create spfile='+DATA_DG/PARAM/spfilePROD1CDB.ora' from pfile='/tmp/pfile.ora';
+
+update the pfile with the new spfile location
+
+srvctl modify database -d PROD1CDB -p +DATA_DG/PARAM/spfilePROD1CDB.ora
+srvctl modify database -d  PROD1CDB -pwfile '+DATA_DG/PROD1CDB/PASSWORD/orapwprod1cdb'
+srvctl config database -d B2CPRE | grep Spfile
+Spfile: +DATA_DG/PARAM/spfilePROD1CDB.ora
+
+srvctl stop database -d PROD1CDB
+srvctl start database -d PROD1CDB
+
+show parameter spfile
+
+
+alter database recover managed standby database using current logfile disconnect from session parallel 32;
+
+orapwd file=+DATA_DG/PROD1CDB/PASSWORD/orapwprod1cdb password=wH0care# ignorecase=n
+
+pwcreate -–dbuniquename PROD1CDB --format +DATA_DG/PROD1CDB/PASSWORD/orapwprod1cdb wH0care#
+pwcreate --dbuniquename PROD1CDB +DATA_DG/PROD1CDB/PASSWORD/orapwprod1cdb
+
+alter diskgroup DATA_DG set attribute 'compatible.asm'='12.2.0.1'; 
+
+SQL> alter system start rolling migration to '12.2.0.1';

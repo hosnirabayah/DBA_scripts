@@ -1,0 +1,17 @@
+select 
+   mount_status,
+   header_status,
+   mode_status,
+   state,
+   total_mb,
+   free_mb,
+   name,
+   path,
+   label 
+from 
+   v$asm_disk;
+---------------------------
+ALTER DISKGROUP 
+   DATA 
+ADD DISK
+   '/dev/oracleasm/disks/DATA04'

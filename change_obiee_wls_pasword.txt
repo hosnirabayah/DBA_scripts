@@ -1,0 +1,15 @@
+1.   Backup OAS installation directory with tar
+ 2.   Run stop.sh OAS
+ 
+*** Weblogic Server password reset steps ***
+ 3.   Run start.sh -i AdminServer
+ 4.   Reset weblogic password in weblogic admin console
+ 5.   Backup domain_home/servers/AdminServer/security *Key.properties and *Config.properties
+ 6.   Backup domain_home/nodemanager nmUser* Key and Config .properties
+ 7.   Connect to ./wlst.sh connect with old weblogic password
+ 8.   Change with readdomain , cd ('SecuirtyConfiguration/bi') , cmo.setNodeManagerPasswordEncrypted('newpassword')
+ 9.   UpdateDomain()
+ 10. Connect to ./wlst.sh connect with new weblogic password
+ 11. Run stop.sh
+ 12. Run start.sh -c (clear credentials)
+ 13. Login to weblogic console and /em to confirm new weblogic password works

@@ -1,0 +1,6 @@
+select segment_name,max(owner), sum(bytes)/(1024*1024*1024) tt from dba_segments where tablespace_name='BI_REP'
+group by segment_name order by tt desc
+
+select segment_name,max(owner), sum(bytes)/(1024*1024*1024) tt from dba_segments where tablespace_name in (select tablespace_name from dba_data_files
+where file_name like '+DATA%') and segment_type in ('TABLE', 'TABLE PARTITION') 
+group by segment_name order by tt desc

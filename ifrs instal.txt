@@ -1,0 +1,27 @@
+ifrs2ora2017!
+ifrs2grid2017!
+/usr/bin/xterm -ls -display $DISPLAY
+oracle
+
+
+ORACLE_BASE=/u01/app/product/; export ORACLE_BASE
+ORACLE_HOME=/data/app/product/11.2.0/dbhome_1; export ORACLE_HOME
+
+PATH=$PATH:$HOME/bin:$ORACLE_HOME/bin
+
+export PATH
+~
+~
+************************************************
+grid
+
+# User specific environment and startup programs
+ORACLE_BASE=/u01/app/grid; export ORACLE_BASE
+ORACLE_HOME=/u01/app/grid/11.2.0/grid; export ORACLE_HOME
+PATH=$PATH:$HOME/bin:$ORACLE_HOME/bin
+
+export PATH
+
+crsctl stop has
+
+ crsctl enable has to enable has on startup

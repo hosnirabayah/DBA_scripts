@@ -1,0 +1,3 @@
+select 'grant select on SEHATI_PROD_TPO.'||'"'||table_name||'" to '||'AMOHAMED,AMOHD,MHASANEN,OBAZARAA, WALSALAMIN,TDEEK ;'
+
+from dba_tables where owner = 'SEHATI_PROD_TPO'

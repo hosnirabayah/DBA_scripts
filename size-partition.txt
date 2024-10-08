@@ -1,0 +1,6 @@
+select sum(bytes)/(1024*1024*1024) from dba_segments where owner='CBF' and segment_type like 'TABLE SUBP%' and partition_name in (
+
+select subpartition_name from dba_tab_subpartitions where table_name='EDR_TRACK_MASTER' and table_owner='CBF'
+and partition_name like 'P_DATE_TO_201904%'
+
+)

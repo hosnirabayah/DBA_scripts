@@ -1,0 +1,11 @@
+Please check the SMPP details below: 
+
+Parameter Name 	Value 
+SMSC IP an Port 	10.100.97.49:16000
+SMPP ID 	ofm
+SMPP password 	OF@m1
+Bind Type 	Transceiver 
+Bind TON 	5
+Bind NPI 	0
+Input Rate 	3 SMS/sec 
+SMPP version 	3.4

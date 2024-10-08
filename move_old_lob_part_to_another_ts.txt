@@ -1,0 +1,60 @@
+create TABLESPACE  tpo_lobs_ts
+  LOGGING ONLINE PERMANENT BLOCKSIZE 8192
+  EXTENT MANAGEMENT LOCAL AUTOALLOCATE
+  ENCRYPTION USING 'AES256' ENCRYPT DEFAULT   NO INMEMORY 
+ ROW STORE COMPRESS ADVANCED  SEGMENT SPACE MANAGEMENT AUTO
+
+alter user sehati_stg_tpo quota unlimited on tpo_lobs_ts
+
+SELECT /*+ PARALLEL(16) */ 'ALTER TABLE SEHATI_STG_TPO."'||l.table_name||'" MOVE PARTITION '||l.partition_name||' LOB ("'||l.column_name||'") STORE AS (TABLESPACE TPO_LOBS_2021_TS);',
+    d.owner,
+    l.table_name,
+    --d.segment_name,
+    l.partition_name,
+    l.column_name,
+   -- d.tablespace_name,
+   -- l.partition_name,
+    SUM(d.bytes) / 1024 / 1024 /1024 AS size_gb
+FROM
+    dba_lob_partitions l
+JOIN
+    dba_segments d ON l.lob_name = d.segment_name
+    and l.lob_partition_name=d.partition_name
+    and d.tablespace_name = 'TPO_TS'
+    
+WHERE
+    l.table_owner = 'SEHATI_PROD_TPO'
+    and l.partition_name like 'P_DATE_TO_2021%'
+  
+GROUP BY
+    d.owner,
+    l.table_name,
+  --  d.segment_name,
+    l.partition_name,
+    l.column_name
+  --  d.tablespace_name,
+  --  l.partition_name;
+
+  
+
+check the indexes status:
+
+
+select 'alter index SEHATI_STG_TPO."'||index_name||'" rebuild;' script, i.* from dba_indexes i where status not in('VALID','N/A','USABLE')
+
+select index_name, partition_name, 
+'alter index SEHATI_STG_TPO.'||index_name||' rebuild partition '||partition_name||';', status from dba_ind_partitions where status not in('VALID','N/A','USABLE');
+
+subpartition indexes check
+SELECT s.status,
+       s.index_name,
+       s.partition_name,
+       s.subpartition_name
+  FROM dba_ind_subpartitions s
+WHERE index_name IN
+           (SELECT index_name
+              FROM dba_indexes
+            )
+            and status <> 'USABLE' ;
+
+

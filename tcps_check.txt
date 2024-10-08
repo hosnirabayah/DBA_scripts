@@ -1,0 +1,2 @@
+select sys_context('userenv','network_protocol') from dual;
+

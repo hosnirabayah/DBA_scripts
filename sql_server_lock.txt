@@ -1,0 +1,47 @@
+USE [master]
+GO
+SELECT  session_id
+ ,blocking_session_id
+ ,wait_time
+ ,wait_type
+ ,last_wait_type
+ ,wait_resource
+ ,transaction_isolation_level
+ ,lock_timeout
+FROM sys.dm_exec_requests
+WHERE blocking_session_id <> 0
+GO
+
+
+USE [master]
+GO
+SELECT * from sys.dm_tran_locks
+WHERE request_status = 'CONVERT'
+GO
+
+USE [master]
+GO
+SELECT   tl.resource_type
+ ,tl.resource_associated_entity_id
+ ,OBJECT_NAME(p.object_id) AS object_name
+ ,tl.request_status
+ ,tl.request_mode
+ ,tl.request_session_id
+ ,tl.resource_description
+FROM sys.dm_tran_locks tl
+LEFT JOIN sys.partitions p 
+ON p.hobt_id = tl.resource_associated_entity_id
+WHERE tl.resource_database_id = DB_ID()
+GO
+
+USE master;
+GO
+EXEC sp_who 'active';
+GO
+EXEC sp_who2 'active';
+GO
+
+USE master;
+GO
+KILL spid | UOW [WITH STATUSONLY]
+GO

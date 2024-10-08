@@ -1,0 +1,30 @@
+add below to nodemanager.properties
+
+KeyStores=CustomIdentityAndCustomTrust
+CustomIdentityKeystoreType=jks
+CustomIdentityKeyStoreFileName=/u01/data/keystores/identity.jks
+CustomIdentityKeyStorePassPhrase=password
+CustomIdentityPrivateKeyPassPhrase=privatepassword
+CustomIdentityAlias=mykey
+CustomTrustKeyStoreType=jks
+CustomTrustKeyStoreFileName=/u01/data/keystores/trust.jks
+CustomTrustKeyStorePassPhrase=password
+
+
+then:
+
+1. Keep a complete backup of the environment.
+
+2. Launch wlst.
+ORACLE_HOME\oracle_common\common\bin\wlst.sh(.cmd)
+
+3. Connect to the Adminserver/domain.
+connect('<USER>','<PASSWORD1>','t3://<HOSTNAME OR IP WHERE ADMINSERVER LISTENS>:<PORT WHERE ADMINSERVER LISTENS>')
+The <USER> and <PASSWORD1> are for your Weblogic Admin account.
+
+4. Synchronize the keystore.
+syncKeyStores(appStripe='system', keystoreFormat='KSS')
+
+5. Bounce both the Node Manager and AdminServer.
+
+6. Test nmConnect. 

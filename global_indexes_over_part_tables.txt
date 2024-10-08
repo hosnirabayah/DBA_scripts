@@ -1,0 +1,78 @@
+
+SELECT owner,index_name
+/*ADVICE(2): Elements in the SELECT list (either columns or expressions)
+                  are not qualified by a table/view name [403] */
+  FROM dba_indexes
+ WHERE     table_name IN
+               ('TransactionsIds',
+                'CoverageEligibilityRequest',
+                'CoverageEligibilityResponse',
+                'CoverageEligibilityRequestContent',
+                'CoverageEligibilityResponseContent',
+                'AuthorizationRequest',
+                'AuthorizationResponse',
+                'AuthorizationRequestContent',
+                'AuthorizationResponseContent',
+                'ClaimRequest',
+                'ClaimResponse',
+                'ClaimRequestContent',
+                'ClaimResponseContent',
+                'Queue')
+       AND index_type <> 'LOB'
+       AND index_name NOT IN (SELECT DISTINCT (index_name)
+                                FROM dba_ind_partitions
+                               )
+                               and index_name not in (select constraint_name from dba_constraints where owner = 'SEHATI_PROD_TPO')
+							   
+--------------------------------------------------------------------------------------------------------------------------------------
+
+select a.table_name, a.index_name, b.bytes/(1024*1024*1024) from dba_indexes a right outer join dba_segments b on a.index_name=b.segment_name where
+a.index_name in ('IX_CoverageEligibilityRequest_SiteEligibility'
+,'IX_ClaimRequest_AdjudicationOutcome'
+,'COVERAGEELIGIBILITYREQUESTIDENTIFIER'
+,'IX_AuthorizationRequest_FromLicense_ToLicense_Identifier'
+,'IX_AuthorizationRequest_AdjudicationOutcome'
+,'IX_ClaimRequest_TransactionStatus'
+,'IX_ClaimRequest_Identifier_Status'
+,'COVERAGEELIGIBILITYRESPONSE_IDENTIFIER_FROMLICENSE_IDX'
+,'IX_ClaimRequest_Identifier_IdentifierSystem_FromLicense_ToLicense'
+,'IX_COVERAGEELIGIBILITYREQUEST_FROMLICENSE_IDENTIFIER'
+,'IX_AuthorizationRequest_LastResponseId'
+,'IX_AuthorizationRequest_Identifier_IdentifierSystem_FromLicense_ToLicense'
+,'IX_Queue_InsurerLicense'
+,'IX_CoverageEligibilityResponse_FromLicense_BundleID_MessageHeaderID_Identifier'
+,'IX_AuthorizationRequest_LastResponseCreatedAt'
+,'COVERAGEELIGIBILITYRESPONSE_MESSAGEHEADERID_IDX'
+,'IX_CoverageEligibilityRequest_LastResponseCreatedAt'
+,'IX_AuthorizationRequest_FromLicense_BundleID_MessageHeaderID_Identifier'
+,'IX_AuthorizationRequest_ModifiedAt'
+,'IX_ClaimRequest_LastResponseCreatedAt'
+,'IX_AuthorizationRequest_TransactionStatus'
+,'IX_CoverageEligibilityResponse_RequestIdentifier'
+,'IX_CoverageEligibilityRequest_FromLicense_ToLicense_Identifier'
+,'IX_ClaimResponse_RelatedResourceID'
+,'INDEX2'
+,'IX_CoverageEligibilityRequest_BundleID'
+,'IX_AuthorizationRequest_ResourceID_Responded'
+,'IX_AuthorizationRequest_Identifier_Status'
+,'IX_AuthorizationResponse_Identifier'
+,'IX_ClaimRequest_FromLicense_BundleID_MessageHeaderID_Identifier'
+,'IX_AuthorizationResponse_FromLicense_BundleID_MessageHeaderID_Identifier'
+,'IX_ClaimRequest_LastResponseId'
+,'IX_ClaimRequest_BundleID'
+,'IX_ClaimRequest_FromLicense_ToLicense_Identifier'
+,'IX_CoverageEligibilityResponse_Identifier_ToLicense'
+,'IX_CoverageEligibilityRequest_ResourceID_Responded'
+,'IX_AuthorizationResponse_RequestIdentifier_Status'
+,'IX_ClaimResponse_RequestIdentifier_Status'
+,'IX_ClaimRequest_ResourceID_Responded'
+,'IX_COVERAGEELIGIBILITYREQUEST_MESSAGEHEADERID'
+,'IX_CoverageEligibilityRequest_TransactionStatus'
+,'IX_AuthorizationResponse_RelatedResourceID'
+,'IX_CoverageEligibilityResponse_RelatedResourceID'
+,'IX_CoverageEligibilityRequest_LastResponseId'
+,'IX_CoverageEligibilityRequest_FromLicense_BundleID_MessageHeaderID_Identifier'
+,'IX_ClaimResponse_FromLicense_BundleID_MessageHeaderID_Identifier'
+,'IX_ClaimResponse_Identifier'
+)  order by table_name
+                               

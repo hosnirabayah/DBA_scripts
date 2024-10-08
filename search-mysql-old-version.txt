@@ -1,0 +1,12 @@
+A. OBTAINING THE YUM REPO TARBALL
+
+Log on to support.oracle.com using your Oracle SSO ID.
+Click on the "Patches & Updates" tab.
+Click the "Product or Family (Advanced)" button to search by product.
+Type "MySQL Server" for the Product.
+Select desired version in the "Release" pulldown.
+Select "Linux x86-64" in the "Platform" pulldown.
+Select "Description" in the first "and" pulldown under "Platform".
+Select "contains" in the search type pulldown.
+Type "yum repository" in the free text field for the description.
+Click the "Search" button.

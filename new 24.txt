@@ -1,0 +1,1 @@
+./datamodel.sh uploadrpd -I  /u01/Oracle/Middleware/Oracle_Home/user_projects/domains/bi/bidata/service_instances/ssi/metadata/datamodel/customizations/LATEST_PROD_20230203_v61_Cleaning_56.rpd -SI ssi -U weblogic -P Welcome1  -W Admin123

@@ -1,0 +1,7 @@
+#!/bin/bash
+
+backup_path=/var/lib/mysql/wsl_bkp
+
+mysqldump -uroot -pPas4MobApp --databases WM_SELFCARE WM_SELFCARE_2  > $backup_path/WM_SELFCARE-DB_$(date +%Y.%m.%d).sql
+
+find $backup_path -name "WM_SELFCARE-DB_*.sql" -type f -mtime +1 -exec rm {} \;
